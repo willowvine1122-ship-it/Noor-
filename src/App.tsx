@@ -11,17 +11,28 @@ import { Me } from './screens/Me';
 import { Grow } from './screens/Grow';
 import { People } from './screens/People';
 import { Play } from './screens/Play';
+import { More } from './screens/More';
+import { Diary } from './screens/Diary';
+import { Money } from './screens/Money';
+import { English } from './screens/English';
+import { Duas } from './screens/Duas';
+import { Lists } from './screens/Lists';
+import { Focus } from './screens/Focus';
+import { Week } from './screens/Week';
+import { LockGate } from './components/Lock';
 
-export type Tab = 'today' | 'deen' | 'me' | 'grow' | 'people' | 'play';
+type MainTab = 'today' | 'deen' | 'me' | 'grow' | 'more';
+type Room = 'people' | 'play' | 'diary' | 'money' | 'english' | 'duas' | 'lists' | 'focus' | 'week';
+export type Tab = MainTab | Room;
 
-const TABS: { id: Tab; label: string; icon: Parameters<typeof Icon>[0]['name'] }[] = [
+const TABS: { id: MainTab; label: string; icon: Parameters<typeof Icon>[0]['name'] }[] = [
   { id: 'today', label: 'Today', icon: 'sun' },
   { id: 'deen', label: 'Deen', icon: 'moon' },
   { id: 'me', label: 'Me', icon: 'heart' },
   { id: 'grow', label: 'Grow', icon: 'leaf' },
-  { id: 'people', label: 'People', icon: 'user' },
-  { id: 'play', label: 'Play', icon: 'sparkle' },
+  { id: 'more', label: 'More', icon: 'grid' },
 ];
+const isMain = (t: Tab): t is MainTab => TABS.some((x) => x.id === t);
 
 type Update = ReturnType<typeof useStore>['update'];
 
@@ -50,6 +61,8 @@ export function setupFromText(text: string) {
 export function App() {
   const { state, update } = useStore();
   const [tab, setTab] = useState<Tab>(() => (sessionStorage.getItem('noor:tab') as Tab) || 'today');
+  const toMore = () => setTab('more');
+  const shown: MainTab = isMain(tab) ? tab : 'more';
   const [settings, setSettings] = useState(false);
 
   useEffect(() => {
@@ -78,14 +91,22 @@ export function App() {
       <main key={tab} className="fade-in">
         {tab === 'today' && <Today go={setTab} />}
         {tab === 'deen' && <Deen />}
-        {tab === 'me' && <Me />}
+        {tab === 'me' && <Me go={setTab} />}
         {tab === 'grow' && <Grow />}
-        {tab === 'people' && <People />}
-        {tab === 'play' && <Play />}
+        {tab === 'more' && <More go={setTab} />}
+        {tab === 'people' && <People back={toMore} />}
+        {tab === 'play' && <Play back={toMore} />}
+        {tab === 'diary' && <Diary back={toMore} />}
+        {tab === 'money' && <Money back={toMore} />}
+        {tab === 'english' && <English back={toMore} />}
+        {tab === 'duas' && <Duas back={toMore} />}
+        {tab === 'lists' && <Lists back={toMore} />}
+        {tab === 'focus' && <Focus back={toMore} />}
+        {tab === 'week' && <Week back={toMore} />}
       </main>
       <nav className="tabbar" aria-label="Sections">
         {TABS.map((t) => (
-          <button key={t.id} type="button" className={tab === t.id ? 'on' : ''} onClick={() => setTab(t.id)} aria-current={tab === t.id ? 'page' : undefined}>
+          <button key={t.id} type="button" className={shown === t.id ? 'on' : ''} onClick={() => setTab(t.id)} aria-current={shown === t.id ? 'page' : undefined}>
             <Icon name={t.icon} size={22} />
             <span>{t.label}</span>
           </button>
@@ -94,6 +115,7 @@ export function App() {
       <AdhanOverlay />
       <Settings open={settings} onClose={() => setSettings(false)} />
       {!state.onboarded && <Welcome onDone={() => update((s) => { s.onboarded = true; })} />}
+      <LockGate />
     </div>
   );
 }

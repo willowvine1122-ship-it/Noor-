@@ -7,6 +7,10 @@ import { daysBetween, daysUntilBirthday, fmtCountdown, fmtTime, greetingFor, hij
 import { Card, Icon, Ring, SectionTitle, tap } from '../components/ui';
 import { PrayerPills, PrayerSheet } from '../components/prayer';
 import type { Tab } from '../App';
+import { useWeather } from '../lib/weather';
+import { WeatherCard, WeatherChip } from '../components/Weather';
+import { WORDS } from '../lib/content2';
+import { englishIndex, speak } from './English';
 
 export const MOODS: { v: Mood; label: string; face: string }[] = [
   { v: 1, label: 'Heavy', face: 'M8 16c1-1.3 2.4-2 4-2s3 .7 4 2' },
@@ -71,6 +75,9 @@ export function Today({ go }: { go: (t: Tab) => void }) {
   };
 
   const toGo = nextPrayer.start.getTime() - now.getTime();
+  const weather = useWeather();
+  const word = WORDS[englishIndex(day) % WORDS.length];
+  const wordDone = !!state.english.days[key]?.word;
 
   return (
     <div className="screen">
@@ -78,8 +85,15 @@ export function Today({ go }: { go: (t: Tab) => void }) {
         <div>
           <p className="eyebrow">{longDate(now)} · {hijri(now)}</p>
           <h1 className="display">{greetingFor(now)}{state.name ? `, ${state.name}` : ''}</h1>
+          <WeatherChip w={weather} />
         </div>
       </header>
+
+      {now.getDay() === 0 && (
+        <button type="button" className="banner banner-gold" onClick={() => go('week')}>
+          <Icon name="chart" size={18} /> It’s Sunday. Take two minutes to look back at your week. <Icon name="chevron" size={16} />
+        </button>
+      )}
 
       {cycle && (
         <div className="banner banner-rose">
@@ -144,6 +158,8 @@ export function Today({ go }: { go: (t: Tab) => void }) {
         </button>
       </div>
 
+      <WeatherCard w={weather} />
+
       <Card>
         <SectionTitle>How are you, really?</SectionTitle>
         <div className="moods">
@@ -187,6 +203,16 @@ export function Today({ go }: { go: (t: Tab) => void }) {
             <button type="submit" className="icon-btn solid" aria-label="Add"><Icon name="plus" size={18} /></button>
           </form>
         )}
+      </Card>
+
+      <Card tone="sky" className="learn" onClick={() => go('english')}>
+        <p className="eyebrow">Learn one thing · English</p>
+        <div className="row between">
+          <h3 className="learn-word">{word.w}</h3>
+          <button type="button" className="icon-btn speak" aria-label="Hear it" onClick={(e) => { e.stopPropagation(); speak(word.w, 0.75); }}><Icon name="speaker" size={18} /></button>
+        </div>
+        <p className="muted small">{word.means}</p>
+        <span className="nudge-cta">{wordDone ? 'Learned today ✓' : 'Practise it'} <Icon name="chevron" size={16} /></span>
       </Card>
 
       {birthdays.map(({ p, in: n }) => (

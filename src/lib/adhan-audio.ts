@@ -58,7 +58,7 @@ export function unlockAudio() {
   }
 }
 
-function chime() {
+export function chime() {
   try {
     ctx ??= new AudioContext();
     const c = ctx;

@@ -4,11 +4,11 @@ import { avgCycleLength, dayOf, inCycle, isPredicted, nextPeriodPrediction, peri
 import { FEEL_BETTER, JOURNAL_PROMPTS } from '../lib/content';
 import { dateKey, daysBetween, parseKey } from '../lib/time';
 import { Card, Icon, SectionTitle, Sheet, tap } from '../components/ui';
-import { MOODS, MoodFace } from './Today';
+import type { Tab } from '../App';
 
 const MEALS = ['Meal 1 · after waking', 'Meal 2 · with family', 'Meal 3 · after shift'];
 
-export function Me() {
+export function Me({ go }: { go: (t: Tab) => void }) {
   const { state, update } = useStore();
   const { now, key, log, cycle } = useToday(30000);
   const [prompt, setPrompt] = useState(() => JOURNAL_PROMPTS[now.getDate() % JOURNAL_PROMPTS.length]);
@@ -73,22 +73,13 @@ export function Me() {
       <CycleCard />
 
       <Card>
-        <SectionTitle>Journal</SectionTitle>
+        <SectionTitle>Dear diary</SectionTitle>
         <button type="button" className="prompt" onClick={() => setPrompt(JOURNAL_PROMPTS[(JOURNAL_PROMPTS.indexOf(prompt) + 1) % JOURNAL_PROMPTS.length])}>
           {prompt} <span className="muted small">↻</span>
         </button>
         <textarea value={text} onChange={(e) => setText(e.target.value)} rows={4} placeholder="Write freely. Only you will ever see this." />
-        <button type="button" className="btn btn-solid" disabled={!text.trim()} onClick={saveJournal}>Save to my journal</button>
-        {state.journal.slice(0, 5).map((j) => (
-          <details key={j.id} className="entry">
-            <summary>
-              {j.mood && <span className={`mood-mini mood-${j.mood}`}><MoodFace path={MOODS[j.mood - 1].face} size={18} /></span>}
-              {new Date(j.at).toLocaleDateString('en-US', { day: 'numeric', month: 'short' })} · {j.prompt ?? 'Note'}
-            </summary>
-            <p>{j.text}</p>
-            <button type="button" className="link danger" onClick={() => confirm('Delete this entry?') && update((s) => { s.journal = s.journal.filter((x) => x.id !== j.id); })}>Delete</button>
-          </details>
-        ))}
+        <button type="button" className="btn btn-solid" disabled={!text.trim()} onClick={saveJournal}>Save to my diary</button>
+        <button type="button" className="link" onClick={() => go('diary')}>Open my diary{state.journal.length ? ` · ${state.journal.length} ${state.journal.length === 1 ? 'page' : 'pages'}` : ''} →</button>
       </Card>
 
       <Card tone="sage">

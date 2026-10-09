@@ -15,11 +15,12 @@ function shuffle<T>(xs: T[]): T[] {
 
 type Game = 'jar' | 'quiz' | 'match';
 
-export function Play() {
+export function Play({ back }: { back?: () => void }) {
   const [game, setGame] = useState<Game>('jar');
   return (
     <div className="screen">
       <header className="hello">
+        {back && <button type="button" className="back" onClick={back}><Icon name="back" size={18} /> More</button>}
         <p className="eyebrow">Play</p>
         <h1 className="display">Bored? Good.</h1>
         <p className="lede">Something small and fun instead of scrolling.</p>

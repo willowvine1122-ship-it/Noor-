@@ -4,12 +4,16 @@ import { backupJson, download, parseBackup, prayerCalendar } from '../lib/export
 import { clearAdhanFile, loadAdhanFile, playAdhan, saveAdhanFile, stopAdhan, unlockAudio } from '../lib/adhan-audio';
 import { Sheet } from './ui';
 import { SetupPaste } from '../App';
+import { hashPin, newSalt, PinPad } from './Lock';
 
 export function Settings({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { state, update, replace } = useStore();
   const [hasAdhan, setHasAdhan] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const backupRef = useRef<HTMLInputElement>(null);
+  const [pinStep, setPinStep] = useState<null | 'check' | 'remove' | 'new' | 'confirm'>(null);
+  const [firstPin, setFirstPin] = useState('');
+  const [pinMsg, setPinMsg] = useState('');
 
   useEffect(() => {
     if (open) void loadAdhanFile().then((f) => setHasAdhan(!!f));
@@ -69,6 +73,22 @@ export function Settings({ open, onClose }: { open: boolean; onClose: () => void
           <span className="muted small">Fajr after your shift still counts as the same day until then.</span>
         </div>
 
+        <div className="field">PIN lock
+          <span className="muted small">{state.pin ? 'Noor asks for your PIN when you open it, and again after two minutes away.' : 'Keep your diary, money and rest days private with a 4-digit PIN.'}</span>
+          <div className="row gap">
+            {state.pin ? (
+              <>
+                <button type="button" className="btn btn-soft grow" onClick={() => setPinStep('check')}>Change PIN</button>
+                <button type="button" className="btn btn-ghost grow" onClick={() => setPinStep('remove')}>Turn off</button>
+              </>
+            ) : (
+              <button type="button" className="btn btn-soft grow" onClick={() => setPinStep('new')}><span aria-hidden="true">🔒</span> Set a PIN</button>
+            )}
+          </div>
+          {pinMsg && <span className="muted small">{pinMsg}</span>}
+          <span className="muted small">If you forget it, there is no reset. Save a backup first.</span>
+        </div>
+
         <SetupPaste />
 
         <div className="field">Your data
@@ -88,6 +108,21 @@ export function Settings({ open, onClose }: { open: boolean; onClose: () => void
 
         <button type="button" className="btn btn-solid" onClick={onClose}>Done</button>
       </div>
+      {pinStep === 'check' && state.pin && <PinPad title="Current PIN" subtitle="Enter your PIN to change it" check={state.pin} onCancel={() => setPinStep(null)} onDone={() => setPinStep('new')} />}
+      {pinStep === 'remove' && state.pin && <PinPad title="Turn off PIN" subtitle="Enter your PIN to confirm" check={state.pin} onCancel={() => setPinStep(null)} onDone={() => {
+        update((s) => { delete s.pin; });
+        setPinStep(null);
+        setPinMsg('PIN turned off.');
+      }} />}
+      {pinStep === 'new' && <PinPad title="Choose a PIN" subtitle="Four digits you’ll remember" onCancel={() => setPinStep(null)} onDone={(p) => { setFirstPin(p); setPinStep('confirm'); }} />}
+      {pinStep === 'confirm' && <PinPad key="confirm" title="Once more" subtitle="Enter the same PIN again" onCancel={() => setPinStep(null)} onDone={async (p) => {
+        if (p !== firstPin) { setPinStep('new'); setPinMsg('Those didn’t match. Try again.'); return; }
+        const salt = newSalt();
+        const hash = await hashPin(p, salt);
+        update((s) => { s.pin = { salt, hash }; });
+        setPinStep(null);
+        setPinMsg('PIN is on. Noor is locked to you.');
+      }} />}
     </Sheet>
   );
 }

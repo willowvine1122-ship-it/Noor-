@@ -5,7 +5,7 @@ import { FAMILY_IDEAS, PARTNER_PAUSE } from '../lib/content';
 import { daysBetween, daysUntilBirthday, fmtBirthday, parseKey } from '../lib/time';
 import { Card, Empty, Icon, SectionTitle, Sheet, tap } from '../components/ui';
 
-export function People() {
+export function People({ back }: { back?: () => void }) {
   const { state, update } = useStore();
   const { now, key, log } = useToday(60000);
   const [edit, setEdit] = useState<Person | null>(null);
@@ -33,6 +33,7 @@ export function People() {
   return (
     <div className="screen">
       <header className="hello">
+        {back && <button type="button" className="back" onClick={back}><Icon name="back" size={18} /> More</button>}
         <p className="eyebrow">People</p>
         <h1 className="display">Love, without holding on too tight</h1>
       </header>

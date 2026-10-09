@@ -38,6 +38,11 @@ export type HobbyTry = { rating: number; verdict?: 'more' | 'maybe' | 'no'; note
 
 export type LearningGoal = { id: string; title: string; steps: { id: string; text: string; done: boolean }[] };
 
+export type Tx = { id: string; date: string; amount: number; type: 'expense' | 'income'; cat: string; note?: string };
+export type ListItem = { id: string; text: string; done: boolean };
+export type List = { id: string; title: string; items: ListItem[] };
+export type FocusSession = { id: string; at: string; minutes: number; label: string };
+
 export type State = {
   version: 1;
   name: string;
@@ -59,6 +64,12 @@ export type State = {
   partnerNotes: { id: string; at: string; text: string; kind: 'love' | 'gratitude' }[];
   onboarded: boolean;
   play: { jarDone: number; quizBest: number; matchBest?: number };
+  pin?: { salt: string; hash: string };
+  money: { budgets: Record<string, number>; tx: Tx[] };
+  english: { days: Record<string, { word?: boolean; phrase?: boolean; spoke?: boolean; said?: string }>; saved: string[] };
+  lists: List[];
+  focus: FocusSession[];
+  savedDuas: string[];
 };
 
 const KEY = 'noor:v1';
@@ -102,6 +113,11 @@ export function defaultState(): State {
     partnerNotes: [],
     onboarded: false,
     play: { jarDone: 0, quizBest: 0 },
+    money: { budgets: {}, tx: [] },
+    english: { days: {}, saved: [] },
+    lists: [],
+    focus: [],
+    savedDuas: [],
   };
 }
 
