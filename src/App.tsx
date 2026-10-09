@@ -27,9 +27,12 @@ import { Wallpaper } from './components/Wallpaper';
 import { Confetti, Splash } from './components/Motion';
 import { FlyingButterflies } from './components/Butterfly';
 import { syncReminders } from './lib/push';
+import { Lotus } from './screens/Lotus';
+import { RoutineScreen } from './screens/Routine';
+import { LevelUp } from './components/Delight';
 
 type MainTab = 'today' | 'deen' | 'me' | 'grow' | 'more';
-type Room = 'assist' | 'discover' | 'habits' | 'people' | 'play' | 'diary' | 'money' | 'english' | 'duas' | 'lists' | 'focus' | 'week';
+type Room = 'assist' | 'lotus' | 'routine' | 'discover' | 'habits' | 'people' | 'play' | 'diary' | 'money' | 'english' | 'duas' | 'lists' | 'focus' | 'week';
 export type Tab = MainTab | Room;
 
 const TABS: { id: MainTab; label: string; icon: Parameters<typeof Icon>[0]['name'] }[] = [
@@ -128,6 +131,8 @@ export function App() {
         {tab === 'week' && <Week back={toMore} />}
         {tab === 'discover' && <Discover back={toMore} />}
         {tab === 'habits' && <Habits back={toMore} />}
+        {tab === 'lotus' && <Lotus back={toMore} go={setTab} />}
+        {tab === 'routine' && <RoutineScreen back={toMore} />}
       </main>
       <nav className="tabbar" aria-label="Sections" style={{ ['--i' as string]: TABS.findIndex((t) => t.id === shown) }}>
         <span className="tab-pill" aria-hidden="true" />
@@ -140,6 +145,7 @@ export function App() {
       </nav>
       <FlyingButterflies />
       <AdhanOverlay />
+      <LevelUp />
       <Confetti />
       <Splash />
       <Settings open={settings} onClose={() => setSettings(false)} />

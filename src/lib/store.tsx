@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import type { AsrMethod, PrayerId } from './time';
 import type { PaletteId } from './content3';
 import type { WallpaperId } from '../components/Wallpaper';
+import type { Routine } from './routine';
 import { addDays, dateKey, daysBetween, parseKey } from './time';
 
 export type PrayerStatus = 'ontime' | 'late' | 'qada' | 'missed';
@@ -47,6 +48,9 @@ export type ListItem = { id: string; text: string; done: boolean };
 export type List = { id: string; title: string; items: ListItem[] };
 export type FocusSession = { id: string; at: string; minutes: number; label: string };
 
+export type LotusItem = { id: string; text: string; at: string; done?: boolean };
+export type Lotus = { focus: Record<string, { text: string; done?: boolean }>; tasks: LotusItem[]; ideas: LotusItem[]; wins: LotusItem[] };
+
 export type State = {
   version: 1;
   name: string;
@@ -78,6 +82,9 @@ export type State = {
   savedDuas: string[];
   habits: { id: string; name: string }[];
   savedStories: { id: string; title: string; url: string; source: string; at: string }[];
+  routine?: Routine;
+  lotus: Lotus;
+  gifts: Record<string, number>; // Noor day key → which gift she opened
 };
 
 const KEY = 'noor:v1';
@@ -132,6 +139,8 @@ export function defaultState(): State {
     savedDuas: [],
     habits: [],
     savedStories: [],
+    lotus: { focus: {}, tasks: [], ideas: [], wins: [] },
+    gifts: {},
   };
 }
 

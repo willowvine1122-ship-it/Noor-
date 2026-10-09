@@ -2,6 +2,10 @@ import { useState } from 'react';
 import { useToday } from '../lib/hooks';
 import { dayOf, inCycle, nextPeriodPrediction, uid, useStore, type Energy, type Mood } from '../lib/store';
 import { rhythm } from '../lib/coach';
+import { dayTimes, getRoutine } from '../lib/routine';
+import { LateChips } from './Routine';
+import { DailyGift, LevelStrip } from '../components/Delight';
+import { LotusFlower, PETALS } from '../components/LotusFlower';
 import { buildSteps, doneToday, prayerStreak } from '../lib/assistant';
 import { Assistant } from './Assistant';
 import { Garden } from '../components/Garden';
@@ -46,7 +50,8 @@ export function Today({ go }: { go: (t: Tab) => void }) {
   const [taskText, setTaskText] = useState('');
 
   const partner = state.people.find((p) => p.partner)?.name;
-  const items = rhythm(day, prayers, partner);
+  const times = dayTimes(state, day);
+  const items = rhythm(day, prayers, times, partner);
   const nowIdx = items.findIndex((i) => i.at > now);
   const tasbihTotal = TASBIHAT.reduce((a, t) => a + Math.min(log.tasbih[t.id] ?? 0, state.tasbihTargets[t.id] ?? t.target), 0);
   const tasbihGoal = TASBIHAT.reduce((a, t) => a + (state.tasbihTargets[t.id] ?? t.target), 0);
@@ -66,6 +71,9 @@ export function Today({ go }: { go: (t: Tab) => void }) {
   const onTime = Object.values(log.prayers).filter((x) => x === 'ontime').length;
   const streak = prayerStreak(state, day, key, (k) => inCycle(state, k));
 
+  const lotusOpen = Math.min(PETALS, state.lotus.wins.filter((w) => now.getTime() - new Date(w.at).getTime() < 7 * 86400000).length);
+  const lotusFocus = state.lotus.focus[key];
+
   const toGo = nextPrayer.start.getTime() - now.getTime();
   const weather = useWeather();
   const word = WORDS[englishIndex(day) % WORDS.length];
@@ -81,6 +89,14 @@ export function Today({ go }: { go: (t: Tab) => void }) {
           <WeatherChip w={weather} />
         </div>
       </header>
+
+      <DailyGift day={day} dayKey={key} />
+
+      {times.weekend && (
+        <button type="button" className="banner banner-lilac" onClick={() => go('routine')}>
+          <Icon name="sparkle" size={18} /> Weekend mode. {times.shift ? 'Easy pace today.' : 'No shift tonight.'}{times.lotus ? ` Lotus deep work at ${fmtTime(times.lotus.start)}.` : ''} <Icon name="chevron" size={16} />
+        </button>
+      )}
 
       {now.getDay() === 0 && (
         <button type="button" className="banner banner-gold" onClick={() => go('week')}>
@@ -126,7 +142,27 @@ export function Today({ go }: { go: (t: Tab) => void }) {
 
       <Assistant go={go} embedded />
 
+      {now >= new Date(times.sleep.getTime() - (times.late + 9 * 60) * 60000) && (
+        <Card tone="lilac" className="late-card">
+          <SectionTitle>{times.late ? `Sleeping at ${fmtTime(times.sleep)} tonight` : 'Staying up later tonight?'}</SectionTitle>
+          <p className="muted small">{times.late ? 'Your sleep reminder and tomorrow’s wake-up moved with you. Salah times stay the same.' : 'Working on Lotus late? Tell Noor and your sleep reminder moves.'}</p>
+          <LateChips value={times.late} onPick={(m) => update((s) => { const r = getRoutine(s); r.late = { ...r.late, [key]: m }; s.routine = r; })} />
+        </Card>
+      )}
+
       <Garden done={done} total={done + steps.length} butterflies={onTime} streak={streak} onOpen={() => go('assist')} />
+
+      <LevelStrip />
+
+      <button type="button" className="lotus-card" onClick={() => go('lotus')}>
+        <LotusFlower open={lotusOpen} size={118} />
+        <span className="grow">
+          <span className="eyebrow">Lotus</span>
+          <strong>{lotusFocus ? (lotusFocus.done ? `Done: ${lotusFocus.text}` : lotusFocus.text) : 'What’s your one Lotus thing today?'}</strong>
+          <small className="muted">{lotusOpen} of {PETALS} petals open this week</small>
+        </span>
+        <Icon name="chevron" size={18} />
+      </button>
 
       <section className="verse">
         <p className="eyebrow">Verse for today</p>
@@ -236,7 +272,7 @@ export function Today({ go }: { go: (t: Tab) => void }) {
       </Card>
 
       <Card>
-        <SectionTitle action={<button type="button" className="link" onClick={() => setShowRhythm((v) => !v)}>{showRhythm ? 'Less' : 'Full day'}</button>}>Your rhythm</SectionTitle>
+        <SectionTitle action={<span className="row gap"><button type="button" className="link" onClick={() => go('routine')}>Edit</button><button type="button" className="link" onClick={() => setShowRhythm((v) => !v)}>{showRhythm ? 'Less' : 'Full day'}</button></span>}>{times.weekend ? 'Your weekend rhythm' : 'Your rhythm'}</SectionTitle>
         <ol className="timeline">
           {(showRhythm ? items : items.slice(Math.max(0, nowIdx - 1), Math.max(0, nowIdx - 1) + 4)).map((i) => {
             const idx = items.indexOf(i);

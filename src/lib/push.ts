@@ -3,7 +3,7 @@
 // Noor is closed. Only reminder text and times leave the phone: no names, no notes.
 import type { State } from './store';
 import { readDay, inCycle } from './store';
-import { at } from './coach';
+import { dayTimes } from './routine';
 import { TASBIHAT } from './content';
 import { addDays, dateKey, noorDate, prayersForDay, PRAYER_NAMES } from './time';
 
@@ -94,6 +94,8 @@ export function buildReminders(state: State, now: Date): Reminder[] {
     const prayers = prayersForDay(day, state.asr);
     const p = Object.fromEntries(prayers.map((x) => [x.id, x])) as Record<(typeof prayers)[number]['id'], (typeof prayers)[number]>;
     const rest = inCycle(state, key);
+    const t = dayTimes(state, day);
+    const wake = plus(t.wake, 5);
 
     if (rest) {
       add(`${key}-dhikr`, plus(p.asr.start, 5), 'A moment for dhikr', 'SubhanAllah, Alhamdulillah, Allahu Akbar. On rest days, your dhikr is your worship.', 'dhikr');
@@ -102,7 +104,6 @@ export function buildReminders(state: State, now: Date): Reminder[] {
         if (log.prayers[pr.id]) continue;
         const name = PRAYER_NAMES[pr.id].en;
         // Dhuhr comes in while she sleeps: call her for it when she wakes instead
-        const wake = at(day, 13, 35);
         const first = pr.id === 'dhuhr' && pr.start < wake ? wake : pr.start;
         add(`${key}-${pr.id}-adhan`, first, pr.id === 'dhuhr' && first === wake ? 'Good morning. Dhuhr first' : `It’s time for ${name}`, 'Allah is calling you. Leave everything for ten minutes, make wudu and go to Him.', pr.id);
         add(`${key}-${pr.id}-check`, plus(first, 25), `Did you pray ${name}?`, 'Open Noor and mark it. If not yet, get up now. There is still time.', pr.id);
@@ -113,17 +114,18 @@ export function buildReminders(state: State, now: Date): Reminder[] {
       }
     }
 
-    if (!log.tasks.length) add(`${key}-wake`, at(day, 14, 5), 'Choose your three things', 'Open Noor and plan today in one minute. Three is enough.', 'day');
-    if (!log.meals[0]) add(`${key}-meal0`, at(day, 14, 15), 'Time to eat something', 'Small is fine: toast, fruit, anything. Your body needs fuel.', 'meal');
-    if (!rest && !log.quranPages) add(`${key}-quran`, at(day, 14, 50), 'One page of Quran', 'Five minutes with the words of your Rabb. Open Noor and read it.', 'quran');
+    if (!log.tasks.length) add(`${key}-wake`, plus(t.wake, 35), 'Choose your three things', 'Open Noor and plan today in one minute. Three is enough.', 'day');
+    if (!log.meals[0]) add(`${key}-meal0`, plus(t.wake, 45), 'Time to eat something', 'Small is fine: toast, fruit, anything. Your body needs fuel.', 'meal');
+    if (!rest && !log.quranPages) add(`${key}-quran`, plus(t.wake, 80), 'One page of Quran', 'Five minutes with the words of your Rabb. Open Noor and read it.', 'quran');
     const tasbih = TASBIHAT.reduce((a, t) => a + (log.tasbih[t.id] ?? 0), 0);
-    if (!tasbih) add(`${key}-tasbih`, at(day, 16, 30), 'Your tasbih', 'A few minutes of SubhanAllah, Alhamdulillah, Allahu Akbar.', 'tasbih');
+    if (!tasbih) add(`${key}-tasbih`, plus(t.wake, 180), 'Your tasbih', 'A few minutes of SubhanAllah, Alhamdulillah, Allahu Akbar.', 'tasbih');
+    if (t.lotus && !log.marks.includes('lotus')) add(`${key}-lotus`, t.lotus.start, t.weekend ? 'Lotus deep work time' : 'Your Lotus block', 'Phone face down, one thing at a time. Open your Lotus space and begin.', 'lotus');
     if (!log.meals[1]) add(`${key}-meal1`, plus(p.isha.start, 25), 'Dinner with your family', 'Sit with them and eat, even a little.', 'meal');
-    [[17, 0, 3], [21, 0, 5], [1, 0, 7]].forEach(([h, m, need]) => {
-      if (log.water < need) add(`${key}-water-${h}`, at(day, h, m), 'Drink a glass of water', `Aim for ${need} glasses by now. Go fill one; it takes a minute.`, 'water');
+    [[210, 3], [450, 5], [690, 7]].forEach(([m, need]) => {
+      if (log.water < need) add(`${key}-water-${m}`, plus(t.wake, m), 'Drink a glass of water', `Aim for ${need} glasses by now. Go fill one; it takes a minute.`, 'water');
     });
     if (!log.meals[2]) add(`${key}-meal2`, plus(p.fajr.start, 20), 'Eat something warm before sleep', 'A small bowl of anything. Then rest.', 'meal');
-    if (!log.marks.includes('sleep')) add(`${key}-sleep`, at(day, 6, 20), 'Phone down. Time to sleep', 'Tasbih on your fingers until you drift off. Tomorrow starts kinder when you rest.', 'sleep');
+    if (!log.marks.includes('sleep')) add(`${key}-sleep`, plus(t.sleep, -10), t.late ? 'Lotus can wait now. Time to sleep' : 'Phone down. Time to sleep', 'Tasbih on your fingers until you drift off. Tomorrow starts kinder when you rest.', 'sleep');
   }
   return out.sort((a, b) => a.at.localeCompare(b.at)).slice(0, 120);
 }

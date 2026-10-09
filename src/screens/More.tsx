@@ -9,6 +9,8 @@ import { PhotoHeader, PHOTOS } from '../components/PhotoHeader';
 type Room = { id: Tab; title: string; hint: string; icon: IconName; tone: string };
 
 export const ROOMS: Room[] = [
+  { id: 'lotus', title: 'Lotus', hint: 'Your project garden', icon: 'leaf', tone: 'rose' },
+  { id: 'routine', title: 'My routine', hint: 'Weekday and weekend', icon: 'calendar', tone: 'lilac' },
   { id: 'assist', title: 'Assistant', hint: 'Every step for today', icon: 'sparkle', tone: 'gold' },
   { id: 'discover', title: 'Discover', hint: 'Science and tech today', icon: 'globe', tone: 'sky' },
   { id: 'habits', title: 'Habits', hint: 'Small daily wins', icon: 'flame', tone: 'gold' },
@@ -36,6 +38,7 @@ export function More({ go, openSettings }: { go: (t: Tab) => void; openSettings:
     people: `${state.people.length} people`,
     duas: state.savedDuas.length ? `${state.savedDuas.length} saved` : '14 duas',
     habits: state.habits.length ? `${state.habits.filter((h) => state.days[key]?.habits?.includes(h.id)).length} of ${state.habits.length} today` : 'Start small',
+    lotus: state.lotus.wins.length ? `${state.lotus.wins.length} wins so far` : 'Your project garden',
     lists: state.lists.length ? `${state.lists.length} ${state.lists.length === 1 ? 'list' : 'lists'}` : 'Make one',
   };
   return (
