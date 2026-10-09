@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff7ea"/>
+      <stop offset=".55" stop-color="#fbe6dc"/>
+      <stop offset="1" stop-color="#e3eee7"/>
+    </linearGradient>
+    <radialGradient id="glow" cx=".5" cy=".46" r=".5">
+      <stop offset="0" stop-color="#fffdf6"/>
+      <stop offset=".6" stop-color="#fff3d9" stop-opacity=".8"/>
+      <stop offset="1" stop-color="#fff3d9" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="moon" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#d7b46a"/>
+      <stop offset="1" stop-color="#b48838"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#bg)"/>
+  <circle cx="256" cy="236" r="200" fill="url(#glow)"/>
+  <path d="M300 128a118 118 0 1 0 64 216A132 132 0 0 1 300 128Z" fill="url(#moon)"/>
+  <path d="M338 168l7 20 20 7-20 7-7 20-7-20-20-7 20-7z" fill="#6f9a86"/>
+  <text x="256" y="452" text-anchor="middle" font-family="Georgia, serif" font-size="54" fill="#3f6b58" letter-spacing="6">NOOR</text>
+</svg>
