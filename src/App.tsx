@@ -24,6 +24,7 @@ import { Discover } from './screens/Discover';
 import { Habits } from './screens/Habits';
 import { Assistant } from './screens/Assistant';
 import { Wallpaper } from './components/Wallpaper';
+import { Confetti, Splash } from './components/Motion';
 
 type MainTab = 'today' | 'deen' | 'assist' | 'me' | 'grow' | 'more';
 type Room = 'discover' | 'habits' | 'people' | 'play' | 'diary' | 'money' | 'english' | 'duas' | 'lists' | 'focus' | 'week';
@@ -115,7 +116,8 @@ export function App() {
         {tab === 'discover' && <Discover back={toMore} />}
         {tab === 'habits' && <Habits back={toMore} />}
       </main>
-      <nav className="tabbar" aria-label="Sections">
+      <nav className="tabbar" aria-label="Sections" style={{ ['--i' as string]: TABS.findIndex((t) => t.id === shown) }}>
+        <span className="tab-pill" aria-hidden="true" />
         {TABS.map((t) => (
           <button key={t.id} type="button" className={shown === t.id ? 'on' : ''} onClick={() => setTab(t.id)} aria-current={shown === t.id ? 'page' : undefined}>
             <Icon name={t.icon} size={22} />
@@ -124,6 +126,8 @@ export function App() {
         ))}
       </nav>
       <AdhanOverlay />
+      <Confetti />
+      <Splash />
       <Settings open={settings} onClose={() => setSettings(false)} />
       {!state.onboarded && <Welcome onDone={() => update((s) => { s.onboarded = true; })} />}
       <LockGate />

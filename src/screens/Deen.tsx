@@ -1,3 +1,4 @@
+import { SectionArt } from '../components/Motion';
 import { useState } from 'react';
 import { useToday } from '../lib/hooks';
 import { dayOf, inCycle, readDay, useStore } from '../lib/store';
@@ -56,6 +57,7 @@ export function Deen() {
 
   return (
     <div className="screen">
+      <SectionArt kind="deen" />
       <header className="hello">
         <p className="eyebrow">Deen</p>
         <h1 className="display">Closer to Allah</h1>

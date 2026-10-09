@@ -803,3 +803,125 @@ h3 { margin: 0; font-size: 17px; font-weight: 600; letter-spacing: -.005em; }
 .all-done .sparkles { top: 40px; }
 .all-done .sparkles i { animation: burst 2.4s var(--ease) infinite; animation-delay: calc(var(--i) * .12s); }
 :root[data-theme='dark'] .verse { background-image: radial-gradient(120% 90% at 50% 0%, rgba(195, 154, 75, .18), transparent 70%); }
+
+/* ============ Graphics and motion ============ */
+
+/* ---- living sky hero ---- */
+.scene-hero { min-height: 290px; padding: 22px 22px 112px; display: flex; flex-direction: column; border-radius: 28px; }
+.scene-hero::after { display: none; }
+.scene-hero .sky { position: absolute; inset: 0; width: 100%; height: 100%; }
+.scene-hero .eyebrow.dark { color: rgba(31, 42, 43, .62); }
+.scene-hero.on-night, .scene-hero.on-dusk { color: #fff; }
+.scene-hero.on-night .eyebrow.dark, .scene-hero.on-dusk .eyebrow.dark { color: rgba(255, 255, 255, .72); }
+.scene-hero.on-night .hero-count, .scene-hero.on-dusk .hero-count { color: rgba(255, 255, 255, .85); }
+.scene-hero.on-night .hero-ar, .scene-hero.on-dusk .hero-ar { opacity: .9; }
+.scene-hero.on-night .btn-solid, .scene-hero.on-dusk .btn-solid { background: #fff; color: #1b1f4a; }
+.scene-hero .hero-name { text-shadow: 0 2px 18px rgba(255, 255, 255, .35); font-size: 46px; }
+.scene-hero.on-night .hero-name, .scene-hero.on-dusk .hero-name { text-shadow: 0 2px 22px rgba(160, 170, 255, .45); }
+.scene-hero .hero-btn { margin-top: auto; position: absolute; left: 22px; right: 22px; bottom: 18px; backdrop-filter: blur(6px); }
+.scene-hero .hero-count { margin-top: 6px; }
+.scene-hero .eyebrow, .scene-hero .hero-name, .scene-hero .hero-ar { position: relative; z-index: 1; }
+
+.sky .stars circle { animation: twinkle 3s ease-in-out infinite; }
+@keyframes twinkle { 0%, 100% { opacity: .25; } 50% { opacity: 1; } }
+.sky .sun-rays { animation: spin 40s linear infinite; }
+.sky .sun-glow, .sky .moon-glow { animation: breathe 5s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes breathe { 50% { transform: scale(1.12); opacity: .8; } }
+.sky .twinkle-star { animation: twinkle 2.4s ease-in-out infinite; }
+.sky .cloud { fill: #fff; opacity: .85; }
+.sky .clouds-dark .cloud { fill: #8e93d6; opacity: .22; }
+.sky-golden .cloud { fill: #fff3e3; }
+.sky .c1 { animation: drift-x 60s linear infinite; }
+.sky .c2 { animation: drift-x 85s linear infinite -30s; }
+.sky .c3 { animation: drift-x 70s linear infinite -50s; }
+@keyframes drift-x { from { transform: translateX(-120px); } to { transform: translateX(460px); } }
+.sky .bird { animation: fly 22s linear infinite; }
+.sky .b2 { animation-delay: -1.2s; }
+.sky .b3 { animation-delay: -2.1s; }
+@keyframes fly {
+  0% { transform: translate(-40px, 132px) scale(.9); }
+  25% { transform: translate(100px, 120px) scale(1); }
+  50% { transform: translate(220px, 130px) scale(.9); }
+  100% { transform: translate(460px, 114px) scale(1); }
+}
+.sky .b2 { translate: 14px 8px; } .sky .b3 { translate: 26px -4px; }
+.sky .windows rect { animation: flicker 6s ease-in-out infinite; }
+@keyframes flicker { 0%, 100% { opacity: .9; } 45% { opacity: .35; } 55% { opacity: 1; } }
+.sky .wave { animation: wave 6s linear infinite; }
+.sky .w2 { animation-duration: 9s; animation-direction: reverse; }
+@keyframes wave { to { transform: translateX(40px); } }
+.sky .glint { animation: glint 3.5s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes glint { 50% { transform: scaleX(1.4); opacity: .25; } }
+
+/* ---- section art banners ---- */
+.art { position: relative; height: 150px; margin: 0 -16px -24px; overflow: hidden; -webkit-mask-image: linear-gradient(to bottom, #000 60%, transparent); mask-image: linear-gradient(to bottom, #000 60%, transparent); }
+.art svg { width: 100%; height: 100%; display: block; }
+.app:has(.art) .gear { box-shadow: 0 4px 14px rgba(0, 0, 0, .18); }
+.art .tw { animation: twinkle 3s ease-in-out infinite; }
+.lantern { animation: swing 4.5s ease-in-out infinite; }
+@keyframes swing { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(4deg); } }
+.lamp-glow { animation: breathe 3s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+.flower { animation: sway 5s ease-in-out infinite; }
+@keyframes sway { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+.bloom { animation: bloom 1.2s cubic-bezier(.3, 1.6, .5, 1) both; }
+@keyframes bloom { from { transform: scale(0) rotate(-60deg); } to { transform: scale(1); } }
+.butterfly { animation: flutter-path 16s ease-in-out infinite; }
+.butterfly path { animation: flap .25s ease-in-out infinite alternate; transform-origin: center; transform-box: fill-box; }
+@keyframes flap { to { transform: scaleX(.35); } }
+@keyframes flutter-path { 0% { transform: translate(-20px, 70px); } 25% { transform: translate(110px, 30px); } 50% { transform: translate(230px, 74px); } 75% { transform: translate(320px, 36px); } 100% { transform: translate(430px, 60px); } }
+.soft-pulse { animation: breathe 6s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+.sun-rays-slow { animation: spin 30s linear infinite; }
+.cloud-drift { animation: drift-x 50s linear infinite -20s; }
+.stem { stroke-dasharray: 300; stroke-dashoffset: 300; animation: draw 1.4s ease-out forwards; }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+.leaf { transform: scale(0); animation: bloom .7s cubic-bezier(.3, 1.6, .5, 1) forwards; transform-box: view-box; }
+.bud { animation: breathe 2.6s ease-in-out infinite 1.6s; transform-box: fill-box; transform-origin: center; }
+
+/* ---- opening ---- */
+.splash { position: fixed; inset: 0; z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; background: radial-gradient(circle at 50% 42%, #fffaf0, #fbf2e6 45%, #f3e6f1 100%); animation: splash-out .55s ease 1.85s forwards; }
+.splash-rays { position: absolute; width: 520px; height: 520px; top: calc(42% - 260px); background: repeating-conic-gradient(from 0deg, rgba(230, 190, 110, .14) 0 6deg, transparent 6deg 18deg); border-radius: 50%; -webkit-mask-image: radial-gradient(circle, #000 20%, transparent 70%); mask-image: radial-gradient(circle, #000 20%, transparent 70%); animation: spin 18s linear infinite, fade-in 1s ease both; }
+.splash-mark { width: 120px; height: 120px; position: relative; filter: drop-shadow(0 8px 24px rgba(200, 150, 60, .35)); }
+.splash-moon { stroke-dasharray: 260; stroke-dashoffset: 260; animation: draw 1.1s cubic-bezier(.6, 0, .2, 1) .15s forwards; }
+.splash-star { transform-box: fill-box; transform-origin: center; transform: scale(0); animation: star-pop .6s cubic-bezier(.3, 1.8, .5, 1) 1s forwards; }
+@keyframes star-pop { to { transform: scale(1) rotate(90deg); } }
+.splash-word { position: relative; margin: 6px 0 0; font-family: var(--serif); font-weight: 500; font-size: 52px; letter-spacing: .04em; color: #2a2620; }
+.splash-word span { display: inline-block; opacity: 0; transform: translateY(14px); animation: letter .6s var(--ease) forwards; background: linear-gradient(100deg, #2a2620 40%, #c99a45 50%, #2a2620 60%); background-size: 300% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; }
+@keyframes letter { to { opacity: 1; transform: none; background-position: -100% 0; } }
+.splash-sub { position: relative; margin: 0; font-size: 13px; letter-spacing: .3em; text-transform: uppercase; color: #a08a62; opacity: 0; animation: fade-in .8s ease 1.3s forwards; }
+@keyframes fade-in { to { opacity: 1; } }
+@keyframes splash-out { to { opacity: 0; visibility: hidden; transform: scale(1.04); } }
+
+/* ---- confetti ---- */
+.confetti { position: fixed; left: 50%; top: 55%; z-index: 150; pointer-events: none; }
+.cf { position: absolute; width: 9px; height: 13px; border-radius: 2px; opacity: 0; animation: confetti 2.3s cubic-bezier(.15, .7, .3, 1) var(--d) forwards; }
+.cf-1 { width: 8px; height: 8px; border-radius: 50%; }
+.cf-2 { width: 12px; height: 12px; clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%); }
+@keyframes confetti {
+  0% { opacity: 1; transform: translate(0, 0) rotate(0) scale(.4); }
+  45% { opacity: 1; transform: translate(var(--x), var(--y)) rotate(calc(var(--r) / 2)) scale(1); }
+  100% { opacity: 0; transform: translate(calc(var(--x) * 1.1), calc(var(--y) + 60vh)) rotate(var(--r)) scale(.9); }
+}
+
+/* ---- tab bar: a pill that glides to the chosen tab ---- */
+.tabbar { --n: 6; }
+.tab-pill { position: absolute; top: 6px; bottom: 6px; left: 6px; width: calc((100% - 12px) / var(--n)); border-radius: 20px; background: var(--sage-wash); transform: translateX(calc(var(--i, 0) * 100%)); transition: transform .45s cubic-bezier(.3, 1.4, .5, 1); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sage) 18%, transparent); }
+.tabbar button { position: relative; z-index: 1; }
+.tabbar button.on { background: transparent; }
+.tabbar button.on svg { animation: hop .45s cubic-bezier(.3, 1.8, .5, 1); }
+@keyframes hop { 40% { transform: translateY(-4px) scale(1.12); } }
+
+/* ---- every screen arrives in a soft cascade ---- */
+.screen > * { animation: rise .55s var(--ease) both; }
+.screen > *:nth-child(2) { animation-delay: .05s; } .screen > *:nth-child(3) { animation-delay: .1s; }
+.screen > *:nth-child(4) { animation-delay: .15s; } .screen > *:nth-child(5) { animation-delay: .2s; }
+.screen > *:nth-child(6) { animation-delay: .25s; } .screen > *:nth-child(7) { animation-delay: .3s; }
+.screen > *:nth-child(n+8) { animation-delay: .35s; }
+.card, .tile, .room, .pill, .btn, .diary-row, .q { transition: transform .18s var(--ease), box-shadow .25s; }
+.card:active, .tile:active, .room:active { transform: scale(.98); }
+.room-icon { transition: transform .4s cubic-bezier(.3, 1.8, .5, 1); }
+.room:active .room-icon { transform: rotate(-10deg) scale(1.1); }
+.ring svg circle:last-child { filter: drop-shadow(0 0 4px color-mix(in srgb, currentColor 30%, transparent)); }
+
+@media (prefers-reduced-motion: reduce) {
+  .splash { display: none; }
+}

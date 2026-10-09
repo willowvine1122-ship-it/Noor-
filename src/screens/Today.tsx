@@ -12,6 +12,7 @@ import { WeatherCard, WeatherChip } from '../components/Weather';
 import { WORDS } from '../lib/content2';
 import { englishIndex, speak } from './English';
 import { AYAT } from '../lib/content3';
+import { SkyScene, skyPhase } from '../components/SkyScene';
 
 export const MOODS: { v: Mood; label: string; face: string }[] = [
   { v: 1, label: 'Heavy', face: 'M8 16c1-1.3 2.4-2 4-2s3 .7 4 2' },
@@ -108,7 +109,8 @@ export function Today({ go }: { go: (t: Tab) => void }) {
         </button>
       )}
 
-      <Card className={`hero grad-${current && !cycle && !log.prayers[current.id] ? current.id : nextPrayer.id}`}>
+      <Card className={`hero scene-hero on-${skyPhase(now).phase}`}>
+        <SkyScene now={now} />
         <div className="hero-top">
           <div>
             <p className="eyebrow dark">{current && !cycle && !log.prayers[current.id] ? 'Now' : cycle ? 'Next adhan · a moment for dhikr' : 'Next prayer'}</p>

@@ -4,6 +4,7 @@ import { useToday } from '../lib/hooks';
 import { buildSteps, type Step, type StepDo } from '../lib/assistant';
 import { Icon, Ring, tap } from '../components/ui';
 import type { Tab } from '../App';
+import { celebrate as confetti } from '../components/Motion';
 
 const SNOOZE = 'noor:snooze';
 const loadSnooze = (): Record<string, number> => { try { return JSON.parse(localStorage.getItem(SNOOZE) ?? '{}'); } catch { return {}; } };
@@ -37,6 +38,7 @@ export function Assistant({ go }: { go: (t: Tab) => void }) {
     tap();
     try { navigator.vibrate?.([10, 40, 10]); } catch { /* no haptics */ }
     setCheer(CHEERS[(doneCount + burst) % CHEERS.length]);
+    confetti();
     setBurst((b) => b + 1);
     setTimeout(() => setCheer(null), 2200);
   };

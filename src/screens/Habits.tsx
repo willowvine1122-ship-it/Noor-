@@ -5,6 +5,7 @@ import { HABIT_IDEAS } from '../lib/content3';
 import { addDays, dateKey } from '../lib/time';
 import { Card, Chip, Empty, Icon, SectionTitle, tap } from '../components/ui';
 import { SubHeader } from './More';
+import { celebrate } from '../components/Motion';
 
 export function Habits({ back }: { back: () => void }) {
   const { state, update } = useStore();
@@ -33,6 +34,7 @@ export function Habits({ back }: { back: () => void }) {
       const d = dayOf(s, k);
       d.habits = d.habits.includes(id) ? d.habits.filter((x) => x !== id) : [...d.habits, id];
     });
+    if (!readDay(state, k).habits.includes(id)) celebrate();
   };
 
   const doneToday = state.habits.filter((h) => doneOn(key, h.id)).length;

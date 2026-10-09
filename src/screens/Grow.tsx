@@ -1,3 +1,4 @@
+import { SectionArt } from '../components/Motion';
 import type React from 'react';
 import { useState } from 'react';
 import { useToday } from '../lib/hooks';
@@ -21,6 +22,7 @@ export function Grow() {
 
   return (
     <div className="screen">
+      <SectionArt kind="grow" progress={Object.keys(state.hobbies).length / 8} />
       <header className="hello">
         <p className="eyebrow">Grow</p>
         <h1 className="display">Find what you love</h1>

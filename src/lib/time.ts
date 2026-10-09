@@ -124,3 +124,9 @@ export function fmtBirthday(mmdd: string) {
   const [m, d] = mmdd.split('-').map(Number);
   return new Date(2000, m - 1, d).toLocaleDateString('en-US', { day: 'numeric', month: 'long' });
 }
+
+/** Sunrise and sunset in Karachi for the calendar date of `d`. */
+export function sunTimes(d: Date) {
+  const t = calc(d, 'standard');
+  return { fajr: t.fajr, sunrise: t.sunrise, asr: t.asr, sunset: t.maghrib, isha: t.isha };
+}

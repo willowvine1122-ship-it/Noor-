@@ -1,3 +1,4 @@
+import { SectionArt } from '../components/Motion';
 import { useEffect, useState } from 'react';
 import { useToday } from '../lib/hooks';
 import { avgCycleLength, dayOf, inCycle, isPredicted, nextPeriodPrediction, periodOn, sortedPeriods, uid, useStore } from '../lib/store';
@@ -28,6 +29,7 @@ export function Me({ go }: { go: (t: Tab) => void }) {
 
   return (
     <div className="screen">
+      <SectionArt kind="me" />
       <header className="hello">
         <p className="eyebrow">Me</p>
         <h1 className="display">Take care of you</h1>

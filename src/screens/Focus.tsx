@@ -5,6 +5,7 @@ import { chime, unlockAudio } from '../lib/adhan-audio';
 import { addDays, dateKey } from '../lib/time';
 import { Card, Chip, Empty, Icon, Ring, SectionTitle, tap } from '../components/ui';
 import { SubHeader } from './More';
+import { celebrate } from '../components/Motion';
 
 const LENGTHS = [15, 25, 50];
 const LABELS = ['Work', 'Lotus', 'Study', 'Quran', 'Reading', 'Tidy up'];
@@ -36,6 +37,7 @@ export function Focus({ back }: { back: () => void }) {
     update((s) => { s.focus.unshift({ id: uid(), at: new Date(run.end).toISOString(), minutes: run.minutes, label: run.label }); });
     setRun(null);
     chime();
+    celebrate();
     try { navigator.vibrate?.([200, 100, 200]); } catch { /* no haptics */ }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [now, run]);
