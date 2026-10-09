@@ -1,4 +1,4 @@
-import { SectionArt } from '../components/Motion';
+import { PhotoHeader, PHOTOS } from '../components/PhotoHeader';
 import type React from 'react';
 import { useState } from 'react';
 import { useToday } from '../lib/hooks';
@@ -22,12 +22,7 @@ export function Grow() {
 
   return (
     <div className="screen">
-      <SectionArt kind="grow" progress={Object.keys(state.hobbies).length / 8} />
-      <header className="hello">
-        <p className="eyebrow">Grow</p>
-        <h1 className="display">Find what you love</h1>
-        <p className="lede">Two new things each week. No pressure to be good at them, only curious.</p>
-      </header>
+      <PhotoHeader photo={PHOTOS.grow} eyebrow="Grow" title="Find what you love" lede="Two new things each week. No pressure to be good at them, only curious." flies={['morpho', 'lemon']} />
 
       <Card className="hobby-hero">
         <SectionTitle action={<span className="muted small">Week {week + 1} · {tried} tried</span>}>This week’s two</SectionTitle>

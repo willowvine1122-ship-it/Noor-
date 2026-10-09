@@ -11,7 +11,7 @@ await p.clock.install({ time: new Date('2026-10-09T16:10:00+05:00') });
 await p.addInitScript(() => { if (!localStorage.getItem('noor:v1')) localStorage.setItem('noor:v1', JSON.stringify({ name: 'Afza', onboarded: true, habits: [{ id: 'h1', name: 'Morning adhkar' }] })); });
 await p.goto(url);
 await p.waitForTimeout(700);
-await p.getByRole('button', { name: 'Assistant', exact: true }).click();
+await p.getByRole('button', { name: 'More', exact: true }).click(); await p.locator('.room', { hasText: 'Assistant' }).click();
 await p.waitForTimeout(600);
 const titles = [];
 await p.screenshot({ path: `${out}-01-assist.png`, fullPage: true });
@@ -45,10 +45,10 @@ for (const w of ['Glitter', 'Dreamy space', 'Night galaxy', 'Doodles', 'Aurora']
   await p.locator('.palette', { hasText: w }).click();
   await p.keyboard.press('Escape');
   await p.waitForTimeout(300);
-  await p.getByRole('button', { name: 'Today', exact: true }).click();
+  await p.locator('.tabbar').getByRole('button', { name: 'Today', exact: true }).click();
   await p.waitForTimeout(700);
   await p.screenshot({ path: `${out}-03-${w.split(' ')[0]}-today.png` });
-  await p.getByRole('button', { name: 'Assistant', exact: true }).click();
+  await p.getByRole('button', { name: 'More', exact: true }).click(); await p.locator('.room', { hasText: 'Assistant' }).click();
   await p.waitForTimeout(500);
   await p.screenshot({ path: `${out}-04-${w.split(' ')[0]}-assist.png` });
 }

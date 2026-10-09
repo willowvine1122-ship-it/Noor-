@@ -4,6 +4,7 @@ import type { PrayerState } from '../lib/hooks';
 import { fmtTime, PRAYER_NAMES, type PrayerId } from '../lib/time';
 import { Icon, Sheet, tap } from './ui';
 import { celebrate } from './Motion';
+import { releaseButterfly } from './Butterfly';
 
 const STATUS_LABEL: Record<PrayerStatus, string> = {
   ontime: 'Prayed on time',
@@ -45,6 +46,7 @@ export function PrayerSheet({ prayer, dayKey, current, onClose }: { prayer: Pray
       else delete day.prayers[prayer.id];
     });
     if (s === 'ontime' || s === 'late' || s === 'qada') celebrate();
+    if (s === 'ontime') releaseButterfly();
     onClose();
   };
   const options: PrayerStatus[] = prayer.phase === 'past' ? ['late', 'qada', 'ontime', 'missed'] : ['ontime', 'late'];

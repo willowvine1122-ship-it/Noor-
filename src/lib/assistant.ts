@@ -3,7 +3,7 @@ import type { PrayerState } from './hooks';
 import { at } from './coach';
 import { TASBIHAT } from './content';
 import type { DayLog, PrayerStatus, State } from './store';
-import { PRAYER_NAMES } from './time';
+import { addDays, dateKey, PRAYER_NAMES } from './time';
 
 /** What a step does when she says "done". */
 export type StepDo =
@@ -114,4 +114,34 @@ export function buildSteps(state: State, now: Date, day: Date, key: string, pray
   }
 
   return steps;
+}
+
+/** How many of today's things are done, out of everything today asked for. */
+export function doneToday(state: State, key: string, log: DayLog) {
+  return (
+    Object.values(log.prayers).filter((s) => s && s !== 'missed').length +
+    log.meals.filter(Boolean).length +
+    log.tasks.filter((t) => t.done).length +
+    log.habits.length +
+    (log.quranPages ? 1 : 0) +
+    (log.familyTime.length ? 1 : 0) +
+    (state.english.days[key]?.word ? 1 : 0) +
+    log.marks.filter((m) => m === 'plan' || m === 'sleep').length
+  );
+}
+
+/** Days in a row with all five prayers kept. Rest days don't break it. */
+export function prayerStreak(state: State, today: Date, todayKey: string, rest: (key: string) => boolean) {
+  const full = (k: string) => {
+    const p = state.days[k]?.prayers ?? {};
+    return (['dhuhr', 'asr', 'maghrib', 'isha', 'fajr'] as const).every((id) => p[id] && p[id] !== 'missed');
+  };
+  let n = full(todayKey) ? 1 : 0;
+  for (let i = 1; i < 400; i++) {
+    const k = dateKey(addDays(today, -i));
+    if (rest(k)) continue;
+    if (!full(k)) break;
+    n++;
+  }
+  return n;
 }

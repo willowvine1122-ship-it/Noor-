@@ -1,4 +1,4 @@
-import { SectionArt } from '../components/Motion';
+import { PhotoHeader, PHOTOS } from '../components/PhotoHeader';
 import { useEffect, useState } from 'react';
 import { useToday } from '../lib/hooks';
 import { avgCycleLength, dayOf, inCycle, isPredicted, nextPeriodPrediction, periodOn, sortedPeriods, uid, useStore } from '../lib/store';
@@ -29,12 +29,7 @@ export function Me({ go }: { go: (t: Tab) => void }) {
 
   return (
     <div className="screen">
-      <SectionArt kind="me" />
-      <header className="hello">
-        <p className="eyebrow">Me</p>
-        <h1 className="display">Take care of you</h1>
-        <p className="lede">Your body and heart are an amanah. Look after them gently.</p>
-      </header>
+      <PhotoHeader photo={PHOTOS.me} eyebrow="Me" title="Take care of you" lede="Your body and heart are an amanah. Look after them gently." flies={['rose', 'lilac']} />
 
       <Card tone="rose">
         <SectionTitle action={<span className="muted small">{log.meals.filter(Boolean).length} of 3</span>}>Meals</SectionTitle>

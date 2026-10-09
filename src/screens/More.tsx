@@ -4,10 +4,12 @@ import { useToday } from '../lib/hooks';
 import { monthKey, spentIn } from './Money';
 import { Icon, type IconName } from '../components/ui';
 import type { Tab } from '../App';
+import { PhotoHeader, PHOTOS } from '../components/PhotoHeader';
 
 type Room = { id: Tab; title: string; hint: string; icon: IconName; tone: string };
 
 export const ROOMS: Room[] = [
+  { id: 'assist', title: 'Assistant', hint: 'Every step for today', icon: 'sparkle', tone: 'gold' },
   { id: 'discover', title: 'Discover', hint: 'Science and tech today', icon: 'globe', tone: 'sky' },
   { id: 'habits', title: 'Habits', hint: 'Small daily wins', icon: 'flame', tone: 'gold' },
   { id: 'diary', title: 'Diary', hint: 'Private pages', icon: 'pen', tone: 'rose' },
@@ -38,11 +40,7 @@ export function More({ go, openSettings }: { go: (t: Tab) => void; openSettings:
   };
   return (
     <div className="screen">
-      <header className="hello">
-        <p className="eyebrow">More</p>
-        <h1 className="display">Every corner of your life</h1>
-        <p className="lede">Everything in its place, so your mind doesn’t have to hold it.</p>
-      </header>
+      <PhotoHeader photo={PHOTOS.more} eyebrow="More" title="Every corner of your life" lede="Everything in its place, so your mind doesn’t have to hold it." flies={['morpho', 'rose']} />
       <div className="rooms">
         {ROOMS.map((r) => (
           <button key={r.id} type="button" className={`room tone-${r.tone}`} onClick={() => go(r.id)}>

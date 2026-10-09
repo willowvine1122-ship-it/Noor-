@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import { useToday } from '../lib/hooks';
-import { dayOf, nextPeriodPrediction, uid, useStore, type Energy, type Mood } from '../lib/store';
-import { nextBestAction, rhythm } from '../lib/coach';
+import { dayOf, inCycle, nextPeriodPrediction, uid, useStore, type Energy, type Mood } from '../lib/store';
+import { rhythm } from '../lib/coach';
+import { buildSteps, doneToday, prayerStreak } from '../lib/assistant';
+import { Assistant } from './Assistant';
+import { Garden } from '../components/Garden';
+import { Reminders } from '../components/Reminders';
 import { ACTS_OF_LOVE, TASBIHAT } from '../lib/content';
 import { daysBetween, daysUntilBirthday, fmtCountdown, fmtTime, greetingFor, hijri, longDate, PRAYER_NAMES } from '../lib/time';
 import { Card, Icon, Ring, SectionTitle, tap } from '../components/ui';
@@ -38,10 +42,10 @@ export function Today({ go }: { go: (t: Tab) => void }) {
   const { now, day, key, prayers, nextPrayer, current, log, cycle } = useToday();
   const [prayerOpen, setPrayerOpen] = useState(false);
   const [showRhythm, setShowRhythm] = useState(false);
+  const [showMore, setShowMore] = useState(false);
   const [taskText, setTaskText] = useState('');
 
   const partner = state.people.find((p) => p.partner)?.name;
-  const nudge = nextBestAction(now, day, prayers, log, cycle, log.energy === 'low', partner);
   const items = rhythm(day, prayers, partner);
   const nowIdx = items.findIndex((i) => i.at > now);
   const tasbihTotal = TASBIHAT.reduce((a, t) => a + Math.min(log.tasbih[t.id] ?? 0, state.tasbihTargets[t.id] ?? t.target), 0);
@@ -57,24 +61,10 @@ export function Today({ go }: { go: (t: Tab) => void }) {
 
   const mut = (fn: (d: ReturnType<typeof dayOf>) => void) => update((s) => fn(dayOf(s, key)));
 
-  const runAction = () => {
-    tap();
-    switch (nudge.action) {
-      case 'pray':
-        setPrayerOpen(true);
-        break;
-      case 'meal':
-        go('me');
-        break;
-      case 'quran':
-      case 'tasbih':
-        go('deen');
-        break;
-      case 'water':
-        mut((d) => { d.water = Math.min(12, d.water + 1); });
-        break;
-    }
-  };
+  const steps = buildSteps(state, now, day, key, prayers, log, cycle, log.marks);
+  const done = doneToday(state, key, log);
+  const onTime = Object.values(log.prayers).filter((x) => x === 'ontime').length;
+  const streak = prayerStreak(state, day, key, (k) => inCycle(state, k));
 
   const toGo = nextPrayer.start.getTime() - now.getTime();
   const weather = useWeather();
@@ -132,16 +122,11 @@ export function Today({ go }: { go: (t: Tab) => void }) {
 
       <PrayerPills prayers={prayers} statuses={log.prayers} dayKey={key} cycle={cycle} />
 
-      <Card tone={nudge.tone} className={`nudge ${nudge.urgent ? 'urgent' : ''}`} onClick={nudge.action ? runAction : undefined}>
-        <p className="eyebrow">Your one next thing</p>
-        <h3 className="nudge-title">{nudge.title}</h3>
-        <p className="nudge-detail">{nudge.detail}</p>
-        {nudge.action && (
-          <span className="nudge-cta">
-            {nudge.action === 'water' ? 'Tap to log a glass' : nudge.action === 'pray' ? 'Mark it' : 'Go'} <Icon name="chevron" size={16} />
-          </span>
-        )}
-      </Card>
+      <Reminders compact />
+
+      <Assistant go={go} embedded />
+
+      <Garden done={done} total={done + steps.length} butterflies={onTime} streak={streak} onOpen={() => go('assist')} />
 
       <section className="verse">
         <p className="eyebrow">Verse for today</p>
@@ -150,6 +135,12 @@ export function Today({ go }: { go: (t: Tab) => void }) {
         <p className="verse-ref">{ayah.ref}</p>
       </section>
 
+      <button type="button" className={`more-today ${showMore ? 'open' : ''}`} onClick={() => setShowMore((v) => !v)}>
+        {showMore ? 'Show less' : 'More for today: water, mood, plan, English, rhythm'} <Icon name="chevron" size={16} />
+      </button>
+
+      {showMore && (
+      <>
       <div className="grid4">
         <button type="button" className="tile" onClick={() => go('deen')}>
           <Ring value={cycle ? 0 : Math.min(1, log.quranPages)} color="var(--gold)" size={54}><Icon name="book" size={20} /></Ring>
@@ -260,6 +251,9 @@ export function Today({ go }: { go: (t: Tab) => void }) {
           })}
         </ol>
       </Card>
+
+      </>
+      )}
 
       <PrayerSheet prayer={prayerOpen ? current ?? null : null} dayKey={key} current={current ? log.prayers[current.id] : undefined} onClose={() => setPrayerOpen(false)} />
     </div>

@@ -7,6 +7,7 @@ import { SetupPaste } from '../App';
 import { hashPin, newSalt, PinPad } from './Lock';
 import { PALETTES } from '../lib/content3';
 import { WALLPAPERS } from './Wallpaper';
+import { Reminders } from './Reminders';
 
 export function Settings({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { state, update, replace } = useStore();
@@ -66,6 +67,8 @@ export function Settings({ open, onClose }: { open: boolean; onClose: () => void
             ))}
           </div>
         </div>
+
+        <Reminders />
 
         <div className="field">Adhan
           <div className="seg">

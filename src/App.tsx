@@ -25,15 +25,16 @@ import { Habits } from './screens/Habits';
 import { Assistant } from './screens/Assistant';
 import { Wallpaper } from './components/Wallpaper';
 import { Confetti, Splash } from './components/Motion';
+import { FlyingButterflies } from './components/Butterfly';
+import { syncReminders } from './lib/push';
 
-type MainTab = 'today' | 'deen' | 'assist' | 'me' | 'grow' | 'more';
-type Room = 'discover' | 'habits' | 'people' | 'play' | 'diary' | 'money' | 'english' | 'duas' | 'lists' | 'focus' | 'week';
+type MainTab = 'today' | 'deen' | 'me' | 'grow' | 'more';
+type Room = 'assist' | 'discover' | 'habits' | 'people' | 'play' | 'diary' | 'money' | 'english' | 'duas' | 'lists' | 'focus' | 'week';
 export type Tab = MainTab | Room;
 
 const TABS: { id: MainTab; label: string; icon: Parameters<typeof Icon>[0]['name'] }[] = [
   { id: 'today', label: 'Today', icon: 'sun' },
   { id: 'deen', label: 'Deen', icon: 'moon' },
-  { id: 'assist', label: 'Assistant', icon: 'sparkle' },
   { id: 'me', label: 'Me', icon: 'heart' },
   { id: 'grow', label: 'Grow', icon: 'leaf' },
   { id: 'more', label: 'More', icon: 'grid' },
@@ -76,6 +77,18 @@ export function App() {
     window.scrollTo({ top: 0 });
   }, [tab]);
 
+  // keep the phone reminders in step with what's done: a marked prayer cancels its follow-ups
+  useEffect(() => {
+    const t = setTimeout(() => { void syncReminders(state).catch(() => {}); }, 1500);
+    return () => clearTimeout(t);
+  }, [state]);
+  useEffect(() => {
+    const again = () => { if (document.visibilityState === 'visible') void syncReminders(state).catch(() => {}); };
+    document.addEventListener('visibilitychange', again);
+    const id = setInterval(again, 20 * 60000);
+    return () => { document.removeEventListener('visibilitychange', again); clearInterval(id); };
+  }, [state]);
+
   // one-time setup link: personal details travel in the link, never in the code
   useEffect(() => {
     const setup = readSetupHash(location.hash) ?? readSetupHash(import.meta.env.VITE_SEED ?? '');
@@ -100,7 +113,7 @@ export function App() {
       <main key={tab} className="fade-in">
         {tab === 'today' && <Today go={setTab} />}
         {tab === 'deen' && <Deen />}
-        {tab === 'assist' && <Assistant go={setTab} />}
+        {tab === 'assist' && <Assistant go={setTab} back={() => setTab('today')} />}
         {tab === 'me' && <Me go={setTab} />}
         {tab === 'grow' && <Grow />}
         {tab === 'more' && <More go={setTab} openSettings={() => setSettings(true)} />}
@@ -125,6 +138,7 @@ export function App() {
           </button>
         ))}
       </nav>
+      <FlyingButterflies />
       <AdhanOverlay />
       <Confetti />
       <Splash />

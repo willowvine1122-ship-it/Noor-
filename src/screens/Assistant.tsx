@@ -1,17 +1,18 @@
 import { useState } from 'react';
 import { dayOf, useStore, type State } from '../lib/store';
 import { useToday } from '../lib/hooks';
-import { buildSteps, type Step, type StepDo } from '../lib/assistant';
+import { buildSteps, doneToday, type Step, type StepDo } from '../lib/assistant';
 import { Icon, Ring, tap } from '../components/ui';
 import type { Tab } from '../App';
 import { celebrate as confetti } from '../components/Motion';
+import { releaseButterfly } from '../components/Butterfly';
 
 const SNOOZE = 'noor:snooze';
 const loadSnooze = (): Record<string, number> => { try { return JSON.parse(localStorage.getItem(SNOOZE) ?? '{}'); } catch { return {}; } };
 
 const CHEERS = ['MashaAllah! One more done.', 'Beautiful. Keep going.', 'Alhamdulillah, that’s done.', 'Look at you, getting it done.', 'Proud of you. Next one.'];
 
-export function Assistant({ go }: { go: (t: Tab) => void }) {
+export function Assistant({ go, back, embedded = false }: { go: (t: Tab) => void; back?: () => void; embedded?: boolean }) {
   const { state, update } = useStore();
   const { now, day, key, prayers, log, cycle } = useToday(15000);
   const [snooze, setSnooze] = useState(loadSnooze);
@@ -23,15 +24,7 @@ export function Assistant({ go }: { go: (t: Tab) => void }) {
   const later = all.filter((s) => snooze[s.id] > now.getTime());
   const [first, ...rest] = steps;
 
-  const doneCount =
-    Object.values(log.prayers).filter((s) => s && s !== 'missed').length +
-    log.meals.filter(Boolean).length +
-    log.tasks.filter((t) => t.done).length +
-    log.habits.length +
-    (log.quranPages ? 1 : 0) +
-    (log.familyTime.length ? 1 : 0) +
-    (state.english.days[key]?.word ? 1 : 0) +
-    log.marks.filter((m) => m === 'plan' || m === 'sleep').length;
+  const doneCount = doneToday(state, key, log);
   const total = doneCount + all.length;
 
   const celebrate = () => {
@@ -48,7 +41,7 @@ export function Assistant({ go }: { go: (t: Tab) => void }) {
     update((st: State) => {
       const l = dayOf(st, key);
       switch (d.kind) {
-        case 'prayer': l.prayers[d.prayer] = d.status; break;
+        case 'prayer': l.prayers[d.prayer] = d.status; if (d.status === 'ontime') releaseButterfly(); break;
         case 'meal': l.meals[d.i] = true; break;
         case 'water': l.water = Math.min(12, l.water + 1); break;
         case 'quran': l.quranPages += 1; st.quranPage = Math.min(604, st.quranPage + 1); break;
@@ -72,8 +65,54 @@ export function Assistant({ go }: { go: (t: Tab) => void }) {
   const hour = now.getHours();
   const hello = hour >= 5 && hour < 12 ? 'Almost bedtime' : hour < 17 ? 'Let’s get today done' : hour < 21 ? 'Your evening, sorted' : 'Shift time. I’ve got the rest';
 
+  const card = first ? (
+    <section className={`now-step tone-${first.tone} ${first.urgent ? 'urgent' : ''}`} key={first.id}>
+      <div className="row between">
+        <p className="eyebrow">{first.urgent ? 'Right now' : 'Your next step'}</p>
+        {first.min && <span className="mins"><Icon name="timer" size={14} /> {first.min} min</span>}
+      </div>
+      <span className="now-icon"><Icon name={first.icon} size={26} /></span>
+      <h2 className="now-title">{first.title}</h2>
+      <p className="now-why">{first.why}</p>
+      {first.plan ? (
+        <PlanDay onDone={(tasks) => {
+          update((st) => { const l = dayOf(st, key); tasks.forEach((t, i) => l.tasks.push({ id: `${Date.now()}${i}`, text: t, done: false })); l.marks.push('plan'); });
+          celebrate();
+        }} />
+      ) : (
+        <div className="now-actions">
+          <button type="button" className="btn btn-solid" onClick={() => perform(first, first.done)}>{first.doneLabel ?? 'Done'} <Icon name="check" size={18} /></button>
+          {first.alt && <button type="button" className="btn btn-soft" onClick={() => perform(first, first.alt!.done)}>{first.alt.label}</button>}
+          {first.done.kind === 'task' && <button type="button" className="btn btn-soft" onClick={() => go('focus')}><Icon name="timer" size={16} /> Focus on it</button>}
+        </div>
+      )}
+      <div className="row gap later-row">
+        {!first.urgent && <button type="button" className="link" onClick={() => later30(first)}>Remind me in 30 min</button>}
+        {!first.id.startsWith('pray') && <button type="button" className="link muted-link" onClick={() => skip(first)}>Skip today</button>}
+        {embedded && rest.length > 0 && <button type="button" className="link push-right" onClick={() => go('assist')}>{rest.length} more <Icon name="chevron" size={14} /></button>}
+      </div>
+    </section>
+  ) : (
+    <section className="now-step tone-gold all-done">
+      <Sparkles />
+      <p className="eyebrow">All done for now</p>
+      <h2 className="now-title">You did everything. Alhamdulillah.</h2>
+      <p className="now-why">Rest, read, or do something you love. I’ll bring the next thing when it’s time.</p>
+    </section>
+  );
+
+  if (embedded) {
+    return (
+      <>
+        {cheer && <div className="cheer" key={burst}>{cheer}<Sparkles /></div>}
+        {card}
+      </>
+    );
+  }
+
   return (
     <div className="screen">
+      {back && <button type="button" className="back" onClick={back}><Icon name="back" size={18} /> Today</button>}
       <header className="hello assist-hello">
         <div>
           <p className="eyebrow">Your assistant</p>
@@ -87,40 +126,7 @@ export function Assistant({ go }: { go: (t: Tab) => void }) {
 
       {cheer && <div className="cheer" key={burst}>{cheer}<Sparkles /></div>}
 
-      {first ? (
-        <section className={`now-step tone-${first.tone} ${first.urgent ? 'urgent' : ''}`} key={first.id}>
-          <div className="row between">
-            <p className="eyebrow">{first.urgent ? 'Right now' : 'Your next step'}</p>
-            {first.min && <span className="mins"><Icon name="timer" size={14} /> {first.min} min</span>}
-          </div>
-          <span className="now-icon"><Icon name={first.icon} size={26} /></span>
-          <h2 className="now-title">{first.title}</h2>
-          <p className="now-why">{first.why}</p>
-          {first.plan ? (
-            <PlanDay onDone={(tasks) => {
-              update((st) => { const l = dayOf(st, key); tasks.forEach((t, i) => l.tasks.push({ id: `${Date.now()}${i}`, text: t, done: false })); l.marks.push('plan'); });
-              celebrate();
-            }} />
-          ) : (
-            <div className="now-actions">
-              <button type="button" className="btn btn-solid" onClick={() => perform(first, first.done)}>{first.doneLabel ?? 'Done'} <Icon name="check" size={18} /></button>
-              {first.alt && <button type="button" className="btn btn-soft" onClick={() => perform(first, first.alt!.done)}>{first.alt.label}</button>}
-              {first.done.kind === 'task' && <button type="button" className="btn btn-soft" onClick={() => go('focus')}><Icon name="timer" size={16} /> Focus on it</button>}
-            </div>
-          )}
-          <div className="row gap later-row">
-            {!first.urgent && <button type="button" className="link" onClick={() => later30(first)}>Remind me in 30 min</button>}
-            {!first.id.startsWith('pray') && <button type="button" className="link muted-link" onClick={() => skip(first)}>Skip today</button>}
-          </div>
-        </section>
-      ) : (
-        <section className="now-step tone-gold all-done">
-          <Sparkles />
-          <p className="eyebrow">All done for now</p>
-          <h2 className="now-title">You did everything. Alhamdulillah.</h2>
-          <p className="now-why">Rest, read, or do something you love. I’ll bring the next thing when it’s time.</p>
-        </section>
-      )}
+      {card}
 
       {rest.length > 0 && (
         <section className="card">

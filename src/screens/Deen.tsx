@@ -1,4 +1,4 @@
-import { SectionArt } from '../components/Motion';
+import { PhotoHeader, PHOTOS } from '../components/PhotoHeader';
 import { useState } from 'react';
 import { useToday } from '../lib/hooks';
 import { dayOf, inCycle, readDay, useStore } from '../lib/store';
@@ -57,12 +57,7 @@ export function Deen() {
 
   return (
     <div className="screen">
-      <SectionArt kind="deen" />
-      <header className="hello">
-        <p className="eyebrow">Deen</p>
-        <h1 className="display">Closer to Allah</h1>
-        <p className="lede">{cycle ? 'Rest days: your heart can still be in sujood.' : 'Love shows itself in actions. Here are yours today.'}</p>
-      </header>
+      <PhotoHeader photo={PHOTOS.deen} eyebrow="Deen" title="Closer to Allah" lede={cycle ? 'Rest days: your heart can still be in sujood.' : 'Love shows itself in actions. Here are yours today.'} flies={['lemon', 'monarch']} />
 
       {cycle ? (
         <Card tone="rose">
