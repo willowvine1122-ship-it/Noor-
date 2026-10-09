@@ -1,3 +1,4 @@
+import type React from 'react';
 import { useState } from 'react';
 import { useToday } from '../lib/hooks';
 import { dayOf, uid, useStore } from '../lib/store';
@@ -92,7 +93,7 @@ export function Grow() {
                 <span className="grow">{g.title}</span>
                 <span className="muted small">{done}/{g.steps.length}</span>
               </summary>
-              <div className="bar"><span style={{ width: `${g.steps.length ? (done / g.steps.length) * 100 : 0}%` }} /></div>
+              <div className="bar"><span style={{ '--p': g.steps.length ? done / g.steps.length : 0 } as React.CSSProperties} /></div>
               <ul className="tasks">
                 {g.steps.map((st) => (
                   <li key={st.id} className={st.done ? 'done' : ''}>

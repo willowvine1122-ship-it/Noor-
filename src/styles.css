@@ -415,7 +415,7 @@ h3 { margin: 0; font-size: 17px; font-weight: 600; letter-spacing: -.005em; }
 .goal summary::-webkit-details-marker { display: none; }
 .goal[open] { display: flex; flex-direction: column; gap: 8px; }
 .bar { height: 6px; border-radius: 999px; background: var(--surface-2); overflow: hidden; margin: 6px 0; }
-.bar span { display: block; height: 100%; background: var(--sage); border-radius: 999px; transition: width .5s var(--ease); }
+.bar span { display: block; height: 100%; width: 100%; background: var(--sage); border-radius: 999px; transform-origin: left; transform: scaleX(var(--p, 0)); transition: transform .5s var(--ease); }
 .hearts { display: flex; justify-content: center; gap: 6px; color: var(--line); }
 .hearts button { color: var(--ink-3); transition: transform .2s var(--ease), color .2s; }
 .hearts button.on { color: var(--rose); transform: scale(1.08); }
