@@ -7,7 +7,7 @@ export const PARTNER_CALL = { start: 18, end: 19 };
 
 export type RhythmItem = { at: Date; title: string; kind: 'prayer' | 'meal' | 'deen' | 'body' | 'work' | 'joy' | 'family' | 'rest'; prayer?: PrayerId };
 
-function at(day: Date, h: number, m: number) {
+export function at(day: Date, h: number, m: number) {
   const d = new Date(day);
   d.setHours(h, m, 0, 0);
   // hours before late morning belong to the night after this day

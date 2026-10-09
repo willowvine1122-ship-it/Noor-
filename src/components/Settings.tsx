@@ -6,6 +6,7 @@ import { Sheet } from './ui';
 import { SetupPaste } from '../App';
 import { hashPin, newSalt, PinPad } from './Lock';
 import { PALETTES } from '../lib/content3';
+import { WALLPAPERS } from './Wallpaper';
 
 export function Settings({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { state, update, replace } = useStore();
@@ -44,6 +45,18 @@ export function Settings({ open, onClose }: { open: boolean; onClose: () => void
               </button>
             ))}
           </div>
+        </div>
+
+        <div className="field">Wallpaper
+          <div className="palettes">
+            {WALLPAPERS.map((w) => (
+              <button key={w.id} type="button" className={`palette ${(state.wallpaper ?? 'none') === w.id ? 'on' : ''}`} onClick={() => update((s) => { s.wallpaper = w.id; })}>
+                <span className={`wp-thumb wpt-${w.id}`} style={{ background: w.preview }} />
+                <span>{w.name}</span>
+              </button>
+            ))}
+          </div>
+          {state.wallpaper === 'galaxy' && <span className="muted small">Night galaxy uses dark mode so the stars can shine.</span>}
         </div>
 
         <div className="field">Light or dark

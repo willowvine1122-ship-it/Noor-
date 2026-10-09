@@ -22,14 +22,17 @@ import { Week } from './screens/Week';
 import { LockGate } from './components/Lock';
 import { Discover } from './screens/Discover';
 import { Habits } from './screens/Habits';
+import { Assistant } from './screens/Assistant';
+import { Wallpaper } from './components/Wallpaper';
 
-type MainTab = 'today' | 'deen' | 'me' | 'grow' | 'more';
+type MainTab = 'today' | 'deen' | 'assist' | 'me' | 'grow' | 'more';
 type Room = 'discover' | 'habits' | 'people' | 'play' | 'diary' | 'money' | 'english' | 'duas' | 'lists' | 'focus' | 'week';
 export type Tab = MainTab | Room;
 
 const TABS: { id: MainTab; label: string; icon: Parameters<typeof Icon>[0]['name'] }[] = [
   { id: 'today', label: 'Today', icon: 'sun' },
   { id: 'deen', label: 'Deen', icon: 'moon' },
+  { id: 'assist', label: 'Assistant', icon: 'sparkle' },
   { id: 'me', label: 'Me', icon: 'heart' },
   { id: 'grow', label: 'Grow', icon: 'leaf' },
   { id: 'more', label: 'More', icon: 'grid' },
@@ -82,18 +85,21 @@ export function App() {
 
   useEffect(() => {
     const root = document.documentElement;
-    const dark = state.theme === 'dark' || (state.theme === 'auto' && matchMedia('(prefers-color-scheme: dark)').matches);
+    const dark = state.wallpaper === 'galaxy' || state.theme === 'dark' || (state.theme === 'auto' && matchMedia('(prefers-color-scheme: dark)').matches);
     root.dataset.theme = dark ? 'dark' : 'light';
     root.dataset.palette = state.palette ?? 'pearl';
+    root.dataset.wallpaper = state.wallpaper ?? 'none';
     document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#16191c' : getComputedStyle(root).getPropertyValue('--bg').trim() || '#fbfaf7');
-  }, [state.theme, state.palette]);
+  }, [state.theme, state.palette, state.wallpaper]);
 
   return (
     <div className="app" onPointerDown={unlockAudio}>
+      <Wallpaper id={state.wallpaper ?? 'none'} />
       <button type="button" className="gear" aria-label="Settings" onClick={() => setSettings(true)}><Icon name="gear" size={20} /></button>
       <main key={tab} className="fade-in">
         {tab === 'today' && <Today go={setTab} />}
         {tab === 'deen' && <Deen />}
+        {tab === 'assist' && <Assistant go={setTab} />}
         {tab === 'me' && <Me go={setTab} />}
         {tab === 'grow' && <Grow />}
         {tab === 'more' && <More go={setTab} openSettings={() => setSettings(true)} />}

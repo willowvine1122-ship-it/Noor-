@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import type { AsrMethod, PrayerId } from './time';
 import type { PaletteId } from './content3';
+import type { WallpaperId } from '../components/Wallpaper';
 import { addDays, dateKey, daysBetween, parseKey } from './time';
 
 export type PrayerStatus = 'ontime' | 'late' | 'qada' | 'missed';
@@ -21,6 +22,7 @@ export type DayLog = {
   tasks: { id: string; text: string; done: boolean }[];
   familyTime: string[];
   habits: string[];
+  marks: string[]; // assistant steps finished or skipped today
 };
 
 export type Person = {
@@ -52,6 +54,7 @@ export type State = {
   dayStartHour: number;
   theme: 'light' | 'auto' | 'dark';
   palette: PaletteId;
+  wallpaper: WallpaperId;
   adhanSound: boolean;
   tasbihTargets: Record<string, number>;
   quranPage: number; // next page to read, 1..604
@@ -94,6 +97,7 @@ export function emptyDay(): DayLog {
     tasks: [],
     familyTime: [],
     habits: [],
+    marks: [],
   };
 }
 
@@ -105,6 +109,7 @@ export function defaultState(): State {
     dayStartHour: 11,
     theme: 'light',
     palette: 'pearl',
+    wallpaper: 'none',
     adhanSound: true,
     tasbihTargets: {},
     quranPage: 1,
