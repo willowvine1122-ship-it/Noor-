@@ -2,7 +2,7 @@ import { CalculationMethod, Coordinates, Madhab, PrayerTimes } from 'adhan';
 
 export type PrayerId = 'dhuhr' | 'asr' | 'maghrib' | 'isha' | 'fajr';
 
-// Afza's day runs from waking (afternoon) through her night shift to Fajr,
+// The user's day runs from waking (afternoon) through a night shift to Fajr,
 // so a "Noor day" starts late morning rather than at midnight.
 export const PRAYER_ORDER: PrayerId[] = ['dhuhr', 'asr', 'maghrib', 'isha', 'fajr'];
 

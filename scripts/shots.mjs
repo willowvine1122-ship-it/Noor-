@@ -10,7 +10,7 @@ if (time) await p.clock.install({ time: new Date(time) });
 await p.goto(url + hash);
 await p.waitForTimeout(800);
 await p.screenshot({ path: `${out}-0-welcome-or-today.png` });
-const tabs = ['Today', 'Deen', 'Me', 'Grow', 'People'];
+const tabs = ['Today', 'Deen', 'Me', 'Grow', 'People', 'Play'];
 for (const [i, t] of tabs.entries()) {
   await p.getByRole('button', { name: t, exact: true }).click();
   await p.waitForTimeout(700);

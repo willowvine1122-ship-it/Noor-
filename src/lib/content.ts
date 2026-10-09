@@ -112,7 +112,7 @@ export const JOURNAL_PROMPTS = [
   'Who made you smile today, and why?',
   'What are you avoiding, and what is the smallest first step?',
   'Three blessings you almost forgot to notice.',
-  'What would the calm, organised Afza do tomorrow?',
+  'What would the calm, organised you do tomorrow?',
 ];
 
 export const FEEL_BETTER = [

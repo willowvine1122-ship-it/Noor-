@@ -34,8 +34,9 @@ export function Today({ go }: { go: (t: Tab) => void }) {
   const [showRhythm, setShowRhythm] = useState(false);
   const [taskText, setTaskText] = useState('');
 
-  const nudge = nextBestAction(now, day, prayers, log, cycle, log.energy === 'low');
-  const items = rhythm(day, prayers);
+  const partner = state.people.find((p) => p.partner)?.name;
+  const nudge = nextBestAction(now, day, prayers, log, cycle, log.energy === 'low', partner);
+  const items = rhythm(day, prayers, partner);
   const nowIdx = items.findIndex((i) => i.at > now);
   const tasbihTotal = TASBIHAT.reduce((a, t) => a + Math.min(log.tasbih[t.id] ?? 0, state.tasbihTargets[t.id] ?? t.target), 0);
   const tasbihGoal = TASBIHAT.reduce((a, t) => a + (state.tasbihTargets[t.id] ?? t.target), 0);
@@ -87,7 +88,7 @@ export function Today({ go }: { go: (t: Tab) => void }) {
       )}
       {periodSoon && (
         <button type="button" className="banner banner-rose" onClick={() => go('me')}>
-          <Icon name="calendar" size={18} /> Your cycle may start around now. Tap to mark it when it does.
+          <Icon name="calendar" size={18} /> Your rest days may begin around now. Tap to mark them when they do.
         </button>
       )}
 

@@ -1,4 +1,4 @@
-// Adhan sound: a recording Afza chooses (kept in IndexedDB on her phone),
+// Adhan sound: a recording the user chooses (kept in IndexedDB on the phone),
 // or a soft built-in chime until she adds one.
 
 const DB = 'noor-media';

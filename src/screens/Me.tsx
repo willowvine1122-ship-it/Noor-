@@ -102,7 +102,7 @@ export function Me() {
         </ul>
       </Card>
 
-      {cycle && <p className="note center">Cycle mode is on. Your Deen tab has switched to rest-day worship.</p>}
+      {cycle && <p className="note center">Rest days are on. Your Deen tab has switched to rest-day worship.</p>}
       <Breathe open={breathing} onClose={() => setBreathing(false)} />
     </div>
   );
@@ -141,18 +141,18 @@ function CycleCard() {
 
   return (
     <Card className="cycle">
-      <SectionTitle action={<span className="muted small">private</span>}>My cycle</SectionTitle>
+      <SectionTitle action={<span className="muted small">private</span>}>My rest days</SectionTitle>
       {active && current ? (
         <div className="cycle-status rose">
-          <strong>Day {dayN} of your period</strong>
+          <strong>Rest day {dayN}</strong>
           <span className="muted small">Salah and touching the mushaf are paused. Dhikr, dua and listening continue.</span>
           {!current.end && <button type="button" className="btn btn-soft" onClick={() => { tap(); end(today); }}>It ended today</button>}
         </div>
       ) : (
         <div className="cycle-status">
           <strong>{prediction ? (daysBetween(new Date(), prediction) > 0 ? `Expected in about ${daysBetween(new Date(), prediction)} day${daysBetween(new Date(), prediction) > 1 ? 's' : ''}` : daysBetween(new Date(), prediction) === 0 ? 'Expected around today' : `Expected ${-daysBetween(new Date(), prediction)} day${daysBetween(new Date(), prediction) < -1 ? 's' : ''} ago`) : 'Not tracked yet'}</strong>
-          <span className="muted small">Average cycle: {len} days</span>
-          <button type="button" className="btn btn-soft" onClick={() => { tap(); start(today); }}>My period started today</button>
+          <span className="muted small">Usually every {len} days</span>
+          <button type="button" className="btn btn-soft" onClick={() => { tap(); start(today); }}>My rest days started today</button>
         </div>
       )}
 
@@ -176,23 +176,23 @@ function CycleCard() {
         })}
       </div>
       <div className="legend">
-        <span><i className="cal-key period" /> period</span>
+        <span><i className="cal-key period" /> rest days</span>
         <span><i className="cal-key predicted" /> predicted</span>
       </div>
 
       <Sheet open={!!picked} onClose={() => setPicked(null)} title={picked ? parseKey(picked).toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long' }) : ''}>
         {picked && (
           <div className="stack">
-            <button type="button" className="btn btn-soft" onClick={() => { start(picked); setPicked(null); }}>Period started this day</button>
-            <button type="button" className="btn btn-soft" onClick={() => { end(picked); setPicked(null); }}>Period ended this day</button>
+            <button type="button" className="btn btn-soft" onClick={() => { start(picked); setPicked(null); }}>Rest days started this day</button>
+            <button type="button" className="btn btn-soft" onClick={() => { end(picked); setPicked(null); }}>Rest days ended this day</button>
             {state.periods.some((p) => p.start === picked) && (
-              <button type="button" className="btn btn-ghost" onClick={() => { update((s) => { s.periods = s.periods.filter((p) => p.start !== picked); }); setPicked(null); }}>Remove this period</button>
+              <button type="button" className="btn btn-ghost" onClick={() => { update((s) => { s.periods = s.periods.filter((p) => p.start !== picked); }); setPicked(null); }}>Remove these rest days</button>
             )}
           </div>
         )}
       </Sheet>
       {prediction && !active && <p className="muted small">Next expected: {prediction.toLocaleDateString('en-US', { day: 'numeric', month: 'long' })}. On those days Noor switches your Deen tab to rest-day worship.</p>}
-      {state.periods.length === 0 && <p className="muted small">Tap a date to mark when your last period started. Predictions get better with each cycle.</p>}
+      {state.periods.length === 0 && <p className="muted small">Tap a date to mark when your last rest days began. Noor gets better at predicting each month.</p>}
     </Card>
   );
 }

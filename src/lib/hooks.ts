@@ -18,7 +18,7 @@ export function useNow(intervalMs = 1000) {
 
 export type PrayerState = PrayerSlot & { phase: 'upcoming' | 'now' | 'past' };
 
-/** Everything about "today" in Afza's day, recomputed as time passes. */
+/** Everything about "today" in the user's day, recomputed as time passes. */
 export function useToday(intervalMs = 1000) {
   const { state } = useStore();
   const now = useNow(intervalMs);

@@ -2,6 +2,9 @@ import type { DayLog } from './store';
 import type { PrayerState } from './hooks';
 import { addDays, PRAYER_NAMES, type PrayerId } from './time';
 
+/** The partner's free hour each day (PKT). */
+export const PARTNER_CALL = { start: 18, end: 19 };
+
 export type RhythmItem = { at: Date; title: string; kind: 'prayer' | 'meal' | 'deen' | 'body' | 'work' | 'joy' | 'family' | 'rest'; prayer?: PrayerId };
 
 function at(day: Date, h: number, m: number) {
@@ -15,23 +18,24 @@ function plus(d: Date, min: number) {
   return new Date(d.getTime() + min * 60000);
 }
 
-/** Afza's day rhythm, anchored to real prayer times so it moves with the seasons. */
-export function rhythm(day: Date, prayers: PrayerState[]): RhythmItem[] {
+/** The day rhythm, anchored to real prayer times so it moves with the seasons. */
+export function rhythm(day: Date, prayers: PrayerState[], partner = 'your partner'): RhythmItem[] {
   const p = Object.fromEntries(prayers.map((x) => [x.id, x.start])) as Record<PrayerId, Date>;
   const items: RhythmItem[] = [
     { at: at(day, 13, 30), title: 'Wake up gently, water first', kind: 'body' },
     { at: at(day, 14, 15), title: 'Meal 1: something small and easy', kind: 'meal' },
     { at: at(day, 14, 45), title: 'Quran page and a little learning', kind: 'deen' },
     { at: plus(p.asr, 20), title: 'Focus: Lotus and personal tasks', kind: 'work' },
-    { at: plus(p.maghrib, -55), title: 'Hobby time', kind: 'joy' },
-    { at: plus(p.maghrib, 10), title: 'Family time: sit with them', kind: 'family' },
+    { at: at(day, 17, 0), title: 'Hobby time', kind: 'joy' },
+    { at: at(day, PARTNER_CALL.start, 0), title: `Call with ${partner} (pause for Maghrib)`, kind: 'joy' },
+    { at: at(day, PARTNER_CALL.end, 0), title: 'Family time: sit with them', kind: 'family' },
     { at: plus(p.isha, 25), title: 'Meal 2: dinner with family', kind: 'meal' },
     { at: at(day, 20, 30), title: 'Get ready: water, snack, desk', kind: 'work' },
     { at: at(day, 21, 0), title: 'Shift starts. Bismillah', kind: 'work' },
     { at: at(day, 1, 0), title: 'Snack and stretch break', kind: 'body' },
     { at: at(day, 5, 0), title: 'Shift ends', kind: 'work' },
     { at: plus(p.fajr, 15), title: 'Meal 3: something warm', kind: 'meal' },
-    { at: at(day, 6, 0), title: 'Wind down: short call, phone face down', kind: 'rest' },
+    { at: at(day, 6, 0), title: 'Wind down: phone face down, tasbih', kind: 'rest' },
     { at: at(day, 6, 30), title: 'Sleep. Tasbih on your fingers', kind: 'rest' },
   ];
   for (const x of prayers) items.push({ at: x.start, title: PRAYER_NAMES[x.id].en, kind: 'prayer', prayer: x.id });
@@ -40,7 +44,7 @@ export function rhythm(day: Date, prayers: PrayerState[]): RhythmItem[] {
 
 export type Nudge = { title: string; detail: string; tone: 'gold' | 'rose' | 'sage' | 'sky' | 'lilac'; urgent?: boolean; action?: 'pray' | 'meal' | 'quran' | 'water' | 'tasbih' };
 
-export function nextBestAction(now: Date, day: Date, prayers: PrayerState[], log: DayLog, cycle: boolean, lowEnergy: boolean): Nudge {
+export function nextBestAction(now: Date, day: Date, prayers: PrayerState[], log: DayLog, cycle: boolean, lowEnergy: boolean, partner = 'your partner'): Nudge {
   const current = prayers.find((p) => p.phase === 'now');
   const p = Object.fromEntries(prayers.map((x) => [x.id, x])) as Record<PrayerId, PrayerState>;
 
@@ -77,7 +81,12 @@ export function nextBestAction(now: Date, day: Date, prayers: PrayerState[], log
   if (cycle) {
     return { title: 'Your rest days are still worship', detail: 'Dhikr, dua and listening to Quran. Allah sees your heart.', tone: 'rose', action: 'tasbih' };
   }
-  if (now > p.maghrib.start && now < p.isha.start) {
+  const callStart = at(day, PARTNER_CALL.start, 0);
+  const callEnd = at(day, PARTNER_CALL.end, 0);
+  if (now >= callStart && now < callEnd) {
+    return { title: `Your hour with ${partner}`, detail: 'Be fully there and enjoy it. When it ends at 7, let it end gently and go to your family.', tone: 'lilac' };
+  }
+  if (now >= callEnd && now < at(day, 21, 0)) {
     return { title: 'Be with your family', detail: 'Sit near Ammi and Abbu. You don’t need a reason.', tone: 'rose' };
   }
   if (lowEnergy) {

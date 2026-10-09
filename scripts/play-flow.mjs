@@ -1,0 +1,32 @@
+import { chromium } from 'playwright-core';
+const [,, url, hash, out] = process.argv;
+const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
+const ctx = await b.newContext({ viewport: { width: 440, height: 956 }, deviceScaleFactor: 2, timezoneId: 'Asia/Karachi', isMobile: true, hasTouch: true });
+const p = await ctx.newPage();
+const errors = [];
+p.on('pageerror', (e) => errors.push(e.message));
+await p.clock.install({ time: new Date('2026-10-09T18:30:00+05:00') });
+await p.goto(url + hash);
+await p.waitForTimeout(500);
+await p.getByRole('button', { name: 'Play', exact: true }).click();
+await p.getByRole('button', { name: 'Pick a card from the jar' }).click();
+await p.waitForTimeout(900);
+await p.screenshot({ path: `${out}-jar.png` });
+await p.getByRole('button', { name: 'Quiz', exact: true }).click();
+for (let i = 0; i < 8; i++) {
+  await p.locator('.answer').first().click();
+  await p.getByRole('button', { name: /Next question|See my score/ }).click();
+}
+const score = await p.locator('.quiz-score').innerText();
+await p.screenshot({ path: `${out}-quiz.png` });
+await p.getByRole('button', { name: 'Match', exact: true }).click();
+await p.locator('.mcard').nth(0).click();
+await p.locator('.mcard').nth(1).click();
+await p.waitForTimeout(200);
+await p.screenshot({ path: `${out}-match.png` });
+await p.getByRole('button', { name: 'Me', exact: true }).click();
+const restTitle = await p.getByText('My rest days').count();
+const stats = await p.evaluate(() => JSON.parse(localStorage.getItem('noor:v1')).play);
+const people = await p.evaluate(() => JSON.parse(localStorage.getItem('noor:v1')).people.map((x) => x.name));
+console.log(JSON.stringify({ score, restTitle, stats, people, errors }));
+await b.close();

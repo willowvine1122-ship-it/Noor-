@@ -10,8 +10,9 @@ import { Deen } from './screens/Deen';
 import { Me } from './screens/Me';
 import { Grow } from './screens/Grow';
 import { People } from './screens/People';
+import { Play } from './screens/Play';
 
-export type Tab = 'today' | 'deen' | 'me' | 'grow' | 'people';
+export type Tab = 'today' | 'deen' | 'me' | 'grow' | 'people' | 'play';
 
 const TABS: { id: Tab; label: string; icon: Parameters<typeof Icon>[0]['name'] }[] = [
   { id: 'today', label: 'Today', icon: 'sun' },
@@ -19,6 +20,7 @@ const TABS: { id: Tab; label: string; icon: Parameters<typeof Icon>[0]['name'] }
   { id: 'me', label: 'Me', icon: 'heart' },
   { id: 'grow', label: 'Grow', icon: 'leaf' },
   { id: 'people', label: 'People', icon: 'user' },
+  { id: 'play', label: 'Play', icon: 'sparkle' },
 ];
 
 export function App() {
@@ -38,7 +40,9 @@ export function App() {
     update((s) => {
       if (setup.name) s.name = setup.name;
       for (const p of setup.people ?? []) {
-        if (!s.people.some((x) => x.name === p.name)) s.people.push({ ...p, id: p.id || uid() });
+        const same = s.people.find((x) => x.name === p.name || (p.birthday && x.birthday === p.birthday && x.relation === p.relation));
+        if (same) same.name = p.name;
+        else s.people.push({ ...p, id: p.id || uid() });
       }
       for (const p of setup.periods ?? []) {
         if (!s.periods.some((x) => x.start === p.start)) s.periods.push(p);
@@ -65,6 +69,7 @@ export function App() {
         {tab === 'me' && <Me />}
         {tab === 'grow' && <Grow />}
         {tab === 'people' && <People />}
+        {tab === 'play' && <Play />}
       </main>
       <nav className="tabbar" aria-label="Sections">
         {TABS.map((t) => (

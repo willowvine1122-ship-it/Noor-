@@ -58,6 +58,7 @@ export type State = {
   learning: LearningGoal[];
   partnerNotes: { id: string; at: string; text: string; kind: 'love' | 'gratitude' }[];
   onboarded: boolean;
+  play: { jarDone: number; quizBest: number; matchBest?: number };
 };
 
 const KEY = 'noor:v1';
@@ -100,6 +101,7 @@ export function defaultState(): State {
     learning: [],
     partnerNotes: [],
     onboarded: false,
+    play: { jarDone: 0, quizBest: 0 },
   };
 }
 
