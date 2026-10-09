@@ -1,0 +1,13 @@
+import { chromium } from 'playwright-core';
+const [,, url, link] = process.argv;
+const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
+const p = await (await b.newContext({ viewport: { width: 440, height: 956 }, timezoneId: 'Asia/Karachi' })).newPage();
+const errors = [];
+p.on('pageerror', (e) => errors.push(e.message));
+await p.goto(url);
+await p.getByPlaceholder('https://…#setup=…').fill(link);
+await p.getByRole('button', { name: 'Use setup link' }).click();
+await p.waitForTimeout(400);
+const s = await p.evaluate(() => JSON.parse(localStorage.getItem('noor:v1')));
+console.log(JSON.stringify({ name: s.name, people: s.people.length, rest: s.periods.length, onboarded: s.onboarded, welcomeGone: await p.locator('.welcome').count() === 0, errors }));
+await b.close();

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useStore, uid } from './lib/store';
+import { useStore, uid, type State } from './lib/store';
 import { readSetupHash } from './lib/export';
 import { unlockAudio } from './lib/adhan-audio';
 import { Icon } from './components/ui';
@@ -23,6 +23,30 @@ const TABS: { id: Tab; label: string; icon: Parameters<typeof Icon>[0]['name'] }
   { id: 'play', label: 'Play', icon: 'sparkle' },
 ];
 
+type Update = ReturnType<typeof useStore>['update'];
+
+function applySetup(update: Update, setup: Partial<State>) {
+  update((s) => {
+    if (setup.name) s.name = setup.name;
+    for (const p of setup.people ?? []) {
+      const same = s.people.find((x) => x.name === p.name || (p.birthday && x.birthday === p.birthday && x.relation === p.relation));
+      if (same) same.name = p.name;
+      else s.people.push({ ...p, id: p.id || uid() });
+    }
+    for (const p of setup.periods ?? []) {
+      if (!s.periods.some((x) => x.start === p.start)) s.periods.push(p);
+    }
+    if (setup.cycleLength) s.cycleLength = setup.cycleLength;
+    s.onboarded = true;
+  });
+}
+
+/** Accepts a whole setup link or just the part after #. */
+export function setupFromText(text: string) {
+  const i = text.indexOf('#setup=');
+  return i >= 0 ? readSetupHash(text.slice(i).trim()) : undefined;
+}
+
 export function App() {
   const { state, update } = useStore();
   const [tab, setTab] = useState<Tab>(() => (sessionStorage.getItem('noor:tab') as Tab) || 'today');
@@ -37,19 +61,7 @@ export function App() {
   useEffect(() => {
     const setup = readSetupHash(location.hash) ?? readSetupHash(import.meta.env.VITE_SEED ?? '');
     if (!setup) return;
-    update((s) => {
-      if (setup.name) s.name = setup.name;
-      for (const p of setup.people ?? []) {
-        const same = s.people.find((x) => x.name === p.name || (p.birthday && x.birthday === p.birthday && x.relation === p.relation));
-        if (same) same.name = p.name;
-        else s.people.push({ ...p, id: p.id || uid() });
-      }
-      for (const p of setup.periods ?? []) {
-        if (!s.periods.some((x) => x.start === p.start)) s.periods.push(p);
-      }
-      if (setup.cycleLength) s.cycleLength = setup.cycleLength;
-      s.onboarded = true;
-    });
+    applySetup(update, setup);
     history.replaceState(null, '', location.pathname + location.search);
   }, [update]);
 
@@ -95,6 +107,7 @@ function Welcome({ onDone }: { onDone: () => void }) {
       <p className="eyebrow">Bismillah</p>
       <h1 className="display">Welcome to Noor</h1>
       <p className="lede">A calm place for your deen, your body, your people and your growth.</p>
+      <SetupPaste onApplied={onDone} />
       <label className="field">What should Noor call you?
         <input value={state.name} onChange={(e) => update((s) => { s.name = e.target.value; })} placeholder="Your name" />
       </label>
@@ -107,3 +120,27 @@ function Welcome({ onDone }: { onDone: () => void }) {
     </div>
   );
 }
+
+function SetupPaste({ onApplied }: { onApplied?: () => void }) {
+  const { update } = useStore();
+  const [text, setText] = useState('');
+  const [msg, setMsg] = useState('');
+  return (
+    <div className="field">Have a setup link? Paste it here
+      <div className="add-row">
+        <input value={text} onChange={(e) => { setText(e.target.value); setMsg(''); }} placeholder="https://…#setup=…" />
+        <button type="button" className="icon-btn solid" aria-label="Use setup link" onClick={() => {
+          const setup = setupFromText(text);
+          if (!setup) { setMsg('That doesn’t look like a Noor setup link. Copy the whole link and try again.'); return; }
+          applySetup(update, setup);
+          setText('');
+          setMsg('Your family and details are in. Bismillah.');
+          onApplied?.();
+        }}><Icon name="check" size={18} /></button>
+      </div>
+      {msg && <span className="muted small">{msg}</span>}
+    </div>
+  );
+}
+
+export { SetupPaste };

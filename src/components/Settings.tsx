@@ -3,6 +3,7 @@ import { useStore } from '../lib/store';
 import { backupJson, download, parseBackup, prayerCalendar } from '../lib/export';
 import { clearAdhanFile, loadAdhanFile, playAdhan, saveAdhanFile, stopAdhan, unlockAudio } from '../lib/adhan-audio';
 import { Sheet } from './ui';
+import { SetupPaste } from '../App';
 
 export function Settings({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { state, update, replace } = useStore();
@@ -67,6 +68,8 @@ export function Settings({ open, onClose }: { open: boolean; onClose: () => void
           </div>
           <span className="muted small">Fajr after your shift still counts as the same day until then.</span>
         </div>
+
+        <SetupPaste />
 
         <div className="field">Your data
           <span className="muted small">Everything stays on this phone. Nothing is sent anywhere.</span>
