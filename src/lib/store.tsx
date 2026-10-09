@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import type { AsrMethod, PrayerId } from './time';
+import type { PaletteId } from './content3';
 import { addDays, dateKey, daysBetween, parseKey } from './time';
 
 export type PrayerStatus = 'ontime' | 'late' | 'qada' | 'missed';
@@ -19,6 +20,7 @@ export type DayLog = {
   learned?: string;
   tasks: { id: string; text: string; done: boolean }[];
   familyTime: string[];
+  habits: string[];
 };
 
 export type Person = {
@@ -49,6 +51,7 @@ export type State = {
   asr: AsrMethod;
   dayStartHour: number;
   theme: 'light' | 'auto' | 'dark';
+  palette: PaletteId;
   adhanSound: boolean;
   tasbihTargets: Record<string, number>;
   quranPage: number; // next page to read, 1..604
@@ -70,6 +73,8 @@ export type State = {
   lists: List[];
   focus: FocusSession[];
   savedDuas: string[];
+  habits: { id: string; name: string }[];
+  savedStories: { id: string; title: string; url: string; source: string; at: string }[];
 };
 
 const KEY = 'noor:v1';
@@ -88,6 +93,7 @@ export function emptyDay(): DayLog {
     acts: [],
     tasks: [],
     familyTime: [],
+    habits: [],
   };
 }
 
@@ -98,6 +104,7 @@ export function defaultState(): State {
     asr: 'standard',
     dayStartHour: 11,
     theme: 'light',
+    palette: 'pearl',
     adhanSound: true,
     tasbihTargets: {},
     quranPage: 1,
@@ -118,6 +125,8 @@ export function defaultState(): State {
     lists: [],
     focus: [],
     savedDuas: [],
+    habits: [],
+    savedStories: [],
   };
 }
 

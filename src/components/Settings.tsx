@@ -5,6 +5,7 @@ import { clearAdhanFile, loadAdhanFile, playAdhan, saveAdhanFile, stopAdhan, unl
 import { Sheet } from './ui';
 import { SetupPaste } from '../App';
 import { hashPin, newSalt, PinPad } from './Lock';
+import { PALETTES } from '../lib/content3';
 
 export function Settings({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { state, update, replace } = useStore();
@@ -32,7 +33,20 @@ export function Settings({ open, onClose }: { open: boolean; onClose: () => void
           <span className="muted small">Times are calculated for Karachi (University of Islamic Sciences method).</span>
         </div>
 
-        <div className="field">Appearance
+        <div className="field">Theme
+          <div className="palettes">
+            {PALETTES.map((p) => (
+              <button key={p.id} type="button" className={`palette ${(state.palette ?? 'pearl') === p.id ? 'on' : ''}`} onClick={() => update((s) => { s.palette = p.id; })}>
+                <span className="swatch" style={{ background: `radial-gradient(circle at 30% 30%, ${p.swatch[0]}, transparent 70%), radial-gradient(circle at 75% 70%, ${p.swatch[1]}, transparent 70%), #fff` }}>
+                  <span style={{ background: p.swatch[2] }} />
+                </span>
+                <span>{p.name}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="field">Light or dark
           <div className="seg">
             {(['light', 'auto', 'dark'] as const).map((t) => (
               <button key={t} type="button" className={state.theme === t ? 'on' : ''} onClick={() => update((s) => { s.theme = t; })}>{t === 'light' ? 'Light' : t === 'auto' ? 'Match phone' : 'Dark'}</button>

@@ -8,6 +8,8 @@ import type { Tab } from '../App';
 type Room = { id: Tab; title: string; hint: string; icon: IconName; tone: string };
 
 export const ROOMS: Room[] = [
+  { id: 'discover', title: 'Discover', hint: 'Science and tech today', icon: 'globe', tone: 'sky' },
+  { id: 'habits', title: 'Habits', hint: 'Small daily wins', icon: 'flame', tone: 'gold' },
   { id: 'diary', title: 'Diary', hint: 'Private pages', icon: 'pen', tone: 'rose' },
   { id: 'money', title: 'Money', hint: 'Budget and spending', icon: 'wallet', tone: 'gold' },
   { id: 'english', title: 'English', hint: 'One thing a day', icon: 'chat', tone: 'sky' },
@@ -19,7 +21,7 @@ export const ROOMS: Room[] = [
   { id: 'play', title: 'Play', hint: 'When you’re bored', icon: 'sparkle', tone: 'rose' },
 ];
 
-export function More({ go }: { go: (t: Tab) => void }) {
+export function More({ go, openSettings }: { go: (t: Tab) => void; openSettings: () => void }) {
   const { state } = useStore();
   const { key } = useToday(60000);
   const eng = state.english.days[key];
@@ -31,6 +33,7 @@ export function More({ go }: { go: (t: Tab) => void }) {
     english: engDone === 3 ? 'Done today ✓' : `${engDone} of 3 today`,
     people: `${state.people.length} people`,
     duas: state.savedDuas.length ? `${state.savedDuas.length} saved` : '14 duas',
+    habits: state.habits.length ? `${state.habits.filter((h) => state.days[key]?.habits?.includes(h.id)).length} of ${state.habits.length} today` : 'Start small',
     lists: state.lists.length ? `${state.lists.length} ${state.lists.length === 1 ? 'list' : 'lists'}` : 'Make one',
   };
   return (
@@ -48,6 +51,11 @@ export function More({ go }: { go: (t: Tab) => void }) {
             <span className="room-hint">{badges[r.id] ?? r.hint}</span>
           </button>
         ))}
+        <button type="button" className="room tone-lilac" onClick={openSettings}>
+          <span className="room-icon"><Icon name="gear" size={22} /></span>
+          <strong>Settings</strong>
+          <span className="room-hint">Themes, adhan, PIN</span>
+        </button>
       </div>
     </div>
   );

@@ -3,7 +3,7 @@ import { useEffect, type ReactNode } from 'react';
 type IconName =
   | 'sun' | 'moon' | 'heart' | 'leaf' | 'sparkle' | 'user' | 'gear' | 'check' | 'plus' | 'x'
   | 'drop' | 'book' | 'bowl' | 'bed' | 'bell' | 'calendar' | 'chevron' | 'play' | 'stop' | 'gift' | 'trash' | 'home'
-  | 'wallet' | 'pen' | 'chat' | 'list' | 'timer' | 'lock' | 'grid' | 'cloud' | 'chart' | 'hands' | 'back' | 'speaker' | 'mic' | 'search';
+  | 'wallet' | 'pen' | 'chat' | 'list' | 'timer' | 'lock' | 'grid' | 'cloud' | 'chart' | 'hands' | 'back' | 'speaker' | 'mic' | 'search' | 'bookmark' | 'globe' | 'flame';
 
 const PATHS: Record<IconName, ReactNode> = {
   sun: <><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" /></>,
@@ -41,6 +41,9 @@ const PATHS: Record<IconName, ReactNode> = {
   back: <path d="M15 6l-6 6 6 6" />,
   speaker: <><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4v-5Z" /><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" /></>,
   mic: <><rect x="9" y="3.5" width="6" height="11" rx="3" /><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5" /></>,
+  bookmark: <path d="M7 4h10a1 1 0 0 1 1 1v15l-6-4-6 4V5a1 1 0 0 1 1-1Z" />,
+  globe: <><circle cx="12" cy="12" r="8.5" /><path d="M3.5 12h17M12 3.5c2.5 2.6 3.6 5.4 3.6 8.5s-1.1 5.9-3.6 8.5c-2.5-2.6-3.6-5.4-3.6-8.5s1.1-5.9 3.6-8.5Z" /></>,
+  flame: <path d="M12 21c-3.6 0-6-2.4-6-5.6 0-3.4 2.6-5 3.4-8.4 2.2 1.4 3 3.2 3 4.6 1-.8 1.6-2 1.7-3.4 2.2 1.8 3.9 4.3 3.9 7.2 0 3.2-2.4 5.6-6 5.6Z" />,
   search: <><circle cx="11" cy="11" r="6.5" /><path d="M16 16l4 4" /></>,
 };
 

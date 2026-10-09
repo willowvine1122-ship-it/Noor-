@@ -11,6 +11,7 @@ import { useWeather } from '../lib/weather';
 import { WeatherCard, WeatherChip } from '../components/Weather';
 import { WORDS } from '../lib/content2';
 import { englishIndex, speak } from './English';
+import { AYAT } from '../lib/content3';
 
 export const MOODS: { v: Mood; label: string; face: string }[] = [
   { v: 1, label: 'Heavy', face: 'M8 16c1-1.3 2.4-2 4-2s3 .7 4 2' },
@@ -78,6 +79,7 @@ export function Today({ go }: { go: (t: Tab) => void }) {
   const weather = useWeather();
   const word = WORDS[englishIndex(day) % WORDS.length];
   const wordDone = !!state.english.days[key]?.word;
+  const ayah = AYAT[englishIndex(day) % AYAT.length];
 
   return (
     <div className="screen">
@@ -138,6 +140,13 @@ export function Today({ go }: { go: (t: Tab) => void }) {
           </span>
         )}
       </Card>
+
+      <section className="verse">
+        <p className="eyebrow">Verse for today</p>
+        <p className="verse-ar" lang="ar" dir="rtl">{ayah.ar}</p>
+        <p className="verse-en">“{ayah.en}”</p>
+        <p className="verse-ref">{ayah.ref}</p>
+      </section>
 
       <div className="grid4">
         <button type="button" className="tile" onClick={() => go('deen')}>

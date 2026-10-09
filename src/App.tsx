@@ -20,9 +20,11 @@ import { Lists } from './screens/Lists';
 import { Focus } from './screens/Focus';
 import { Week } from './screens/Week';
 import { LockGate } from './components/Lock';
+import { Discover } from './screens/Discover';
+import { Habits } from './screens/Habits';
 
 type MainTab = 'today' | 'deen' | 'me' | 'grow' | 'more';
-type Room = 'people' | 'play' | 'diary' | 'money' | 'english' | 'duas' | 'lists' | 'focus' | 'week';
+type Room = 'discover' | 'habits' | 'people' | 'play' | 'diary' | 'money' | 'english' | 'duas' | 'lists' | 'focus' | 'week';
 export type Tab = MainTab | Room;
 
 const TABS: { id: MainTab; label: string; icon: Parameters<typeof Icon>[0]['name'] }[] = [
@@ -82,8 +84,9 @@ export function App() {
     const root = document.documentElement;
     const dark = state.theme === 'dark' || (state.theme === 'auto' && matchMedia('(prefers-color-scheme: dark)').matches);
     root.dataset.theme = dark ? 'dark' : 'light';
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#16191c' : '#fbfaf7');
-  }, [state.theme]);
+    root.dataset.palette = state.palette ?? 'pearl';
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#16191c' : getComputedStyle(root).getPropertyValue('--bg').trim() || '#fbfaf7');
+  }, [state.theme, state.palette]);
 
   return (
     <div className="app" onPointerDown={unlockAudio}>
@@ -93,7 +96,7 @@ export function App() {
         {tab === 'deen' && <Deen />}
         {tab === 'me' && <Me go={setTab} />}
         {tab === 'grow' && <Grow />}
-        {tab === 'more' && <More go={setTab} />}
+        {tab === 'more' && <More go={setTab} openSettings={() => setSettings(true)} />}
         {tab === 'people' && <People back={toMore} />}
         {tab === 'play' && <Play back={toMore} />}
         {tab === 'diary' && <Diary back={toMore} />}
@@ -103,6 +106,8 @@ export function App() {
         {tab === 'lists' && <Lists back={toMore} />}
         {tab === 'focus' && <Focus back={toMore} />}
         {tab === 'week' && <Week back={toMore} />}
+        {tab === 'discover' && <Discover back={toMore} />}
+        {tab === 'habits' && <Habits back={toMore} />}
       </main>
       <nav className="tabbar" aria-label="Sections">
         {TABS.map((t) => (
